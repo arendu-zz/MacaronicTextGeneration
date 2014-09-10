@@ -1,0 +1,4 @@
+#!/bin/bash
+pushd ../../
+python generate-sim-wn.py -p True > data/training/en.sim.wn.phrase
+popd
