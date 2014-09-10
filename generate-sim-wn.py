@@ -14,14 +14,15 @@ if __name__ == '__main__':
     optparser.add_option("-e", "--en", dest="english_snt", default="data/training/train.clean.tok.en", help="tags for test set")
     optparser.add_option("-o", "--out", dest="output_sim", default="data/training/en.sim.wn", help="tags for test set")
     (options, _) = optparser.parse_args()
-    vocab_en = list(set(open(options.english_snt, 'r').read().split()))
+    vocab_en = set(open(options.english_snt, 'r').read().lower().split())
 
     for v in vocab_en:
         syn_tokens = []
         for s in wn.synsets(v):
             for l in s.lemmas:
-                if '_' not in l.name and l.name != v:
-                    syn_tokens.append(l.name)
+                k = l.name.lower()
+                if '_' not in k and k != v:
+                    syn_tokens.append(k)
         if len(syn_tokens) > 0:
             out = v + '\t' + ','.join(set(syn_tokens))
             print out.decode('utf-8')
