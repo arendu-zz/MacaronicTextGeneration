@@ -15,16 +15,19 @@ def generate_macaronic(a, d, e):
 
 if __name__ == '__main__':
     optparser = OptionParser()
-    optparser.add_option("-a", "--alignment", dest="alignment", default="data/moses-files/model/aligned.grow-diag-final", help="full words for training")
+    optparser.add_option("-a", "--alignment", dest="alignment",
+                         default="data/moses-files-tok/model/aligned.grow-diag-final", help="full words for training")
 
-    optparser.add_option("-d", "--de", dest="german_snt", default="data/training/train.clean.de", help="Test lemmas")
-    optparser.add_option("-e", "--en", dest="english_snt", default="data/training/train.clean.en", help="tags for test set")
+    optparser.add_option("-d", "--de", dest="german_snt", default="data/training/train.clean.tok.de",
+                         help="Test lemmas")
+    optparser.add_option("-e", "--en", dest="english_snt", default="data/training/train.clean.tok.en",
+                         help="tags for test set")
     (opts, _) = optparser.parse_args()
 
     alignments = open(opts.alignment, 'r').readlines()
     de = open(opts.german_snt, 'r').readlines()
     en = open(opts.english_snt, 'r').readlines()
-    for a, d, e in zip(alignments, de, en):
+    for a, d, e in zip(alignments, de, en)[:200]:
         print a.strip()
         print d.strip()
         m, mf = generate_macaronic(a.strip(), d.strip(), e.strip())

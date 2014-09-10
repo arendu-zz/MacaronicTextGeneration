@@ -47,7 +47,7 @@ def get_emission(o, s):
 def get_viterbi(obs_sequence, trelis):
     pi = {(0, BOUNDRY_STATE): 0.0}
     arg_pi = {(0, BOUNDRY_STATE): []}
-    for k in range(1, len(obs_sequence) + 1):  # the words are numbered from 1 to n, 0 is special start character
+    for k in range(1, len(obs_sequence) + 2):  # the words are numbered from 1 to n, 0 is special start character
         for v in trelis[k]:  # [1]:
             max_prob_to_bt = {}
             for u in trelis[k - 1]:  # [1]:
@@ -201,15 +201,15 @@ if __name__ == '__main__':
         o = get_observations(t, src, tar)
         print alignment.decode('utf-8').strip()
 
-        print 'target    :', ' '.join(tar).decode('utf-8').strip()
+        print ' '.join(tar).decode('utf-8').strip()
         # print 'obs       :', o
         states = get_states(o, synsets, translations)
         # print 'trelis    :', states
         viterbi_states, viterbi_p = get_viterbi(o, [[BOUNDRY_STATE]] + states)
         v_filter = [t1 for t1, t2 in zip(viterbi_states, viterbi_states[1:]) if t1 != t2]
         v_filter.append(viterbi_states[-1])
-        print 'viterbi   :', ' '.join(v_filter).decode('utf-8')
-        print 'src       :', ' '.join(src).decode('utf-8').strip()
+        print ' '.join(v_filter).decode('utf-8')
+        print ' '.join(src).decode('utf-8').strip()
         print ''
         # pdb.set_trace()
 
