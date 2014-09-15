@@ -32,29 +32,49 @@ def flatten_backpointers(bt):
     return reverse_bt
 
 
-def get_transition_prob(mj, mj_1):
-    global language_model
-    if mj_1 == BOUNDRY_STATE:
-        return language_model.score(mj)
+def get_transition_prob(mj, mj_1, original_src_sentence):
+    mod_src_sentence = [s for s in original_src_sentence]
+    if isinstance(mj, tuple):
+        mj_token = mj[0]
+        mj_id = mj[1]
+        mod_src_sentence[mj_id] = mj_token
     else:
-        return language_model.score(mj_1 + ' ' + mj)
+        mj_token = mj
+
+    if isinstance(mj_1, tuple):
+        mj_1_token = mj_1[0]
+        mj_1_id = mj_1[1]
+        mod_src_sentence[mj_1_id] = mj_1_token
+    else:
+        mj_1_token = mj_1
+
+    global language_model
+    full_score = language_model.score(' '.join(mod_src_sentence))
+    return full_score
+    # if mj_1_token == BOUNDRY_STATE:
+    #    return language_model.score(mj_token)
+    #elif mj_token == BOUNDRY_STATE:
+    #    return language_model.score(mj_1_token)
+    #else:
+    #    return language_model.score(mj_1_token + ' ' + mj_token)
 
 
 def get_emission(o, s):
     pass
 
 
-def get_viterbi(obs_sequence, trelis):
+def get_viterbi(obs_sequence, states, original_src_sentence):
+    states.append([BOUNDRY_STATE])
     pi = {(0, BOUNDRY_STATE): 0.0}
     arg_pi = {(0, BOUNDRY_STATE): []}
     for k in range(1, len(obs_sequence) + 2):  # the words are numbered from 1 to n, 0 is special start character
-        for v in trelis[k]:  # [1]:
+        for v in states[k]:  # [1]:
             max_prob_to_bt = {}
-            for u in trelis[k - 1]:  # [1]:
+            for u in states[k - 1]:  # [1]:
                 aj = v
                 aj_1 = u
-                q = get_transition_prob(aj, aj_1)
-                e = log(1.0 / len(trelis[k]))  # get_emission(target_token, source_token)
+                q = get_transition_prob(aj, aj_1, original_src_sentence)
+                e = log(1.0 / len(states[k]))  # get_emission(target_token, source_token)
                 # print k
                 # print v, '|', u
                 # print aj, '|', aj_1, '=', q
@@ -93,14 +113,15 @@ def logadd(x, y):
 
 def get_states(observation, synsets, translations):
     states = []
-    for g, e in observation:
+    for g, e, e_id in observation:
         e_from_g = set([eg[1] for eg in sorted(translations[g])])
         if e not in synsets:
             e_from_syn = [e]
         else:
             e_from_syn = set([s[1] for s in synsets[e]])
         m = list(e_from_g.intersection(e_from_syn))
-        states.append(m)
+        mt = [(ms, e_id) for ms in m]
+        states.append(mt)
     return states
 
 
@@ -132,7 +153,7 @@ def get_observations(target2source, src_tokens, target_tokens):
     observations = []
     for k in sorted(target2source):
         max_align_prob, max_src_id = max(target2source[k])
-        observations.append((target_tokens[k], src_tokens[max_src_id]))
+        observations.append((target_tokens[k], src_tokens[max_src_id], max_src_id))
     return observations
 
 
@@ -205,9 +226,10 @@ if __name__ == '__main__':
         # print 'obs       :', o
         states = get_states(o, synsets, translations)
         # print 'trelis    :', states
-        viterbi_states, viterbi_p = get_viterbi(o, [[BOUNDRY_STATE]] + states)
-        v_filter = [t1 for t1, t2 in zip(viterbi_states, viterbi_states[1:]) if t1 != t2]
-        v_filter.append(viterbi_states[-1])
+        viterbi_states, viterbi_p = get_viterbi(o, [[BOUNDRY_STATE]] + states, src)
+        #v_filter = [t1 for t1, t2 in zip(viterbi_states, viterbi_states[1:]) if t1 != t2]
+        #v_filter.append(viterbi_states[-1])
+        v_filter = [vf[0] for vf in viterbi_states]
         print ' '.join(v_filter).decode('utf-8')
         print ' '.join(src).decode('utf-8').strip()
         print ''
