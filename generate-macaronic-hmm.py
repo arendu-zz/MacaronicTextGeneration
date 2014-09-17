@@ -52,7 +52,7 @@ def get_transition_prob(mj, mj_1, original_src_sentence):
     full_score = language_model.score(' '.join(mod_src_sentence))
     return full_score
     # if mj_1_token == BOUNDRY_STATE:
-    #    return language_model.score(mj_token)
+    # return language_model.score(mj_token)
     #elif mj_token == BOUNDRY_STATE:
     #    return language_model.score(mj_1_token)
     #else:
@@ -227,9 +227,10 @@ if __name__ == '__main__':
         states = get_states(o, synsets, translations)
         # print 'trelis    :', states
         viterbi_states, viterbi_p = get_viterbi(o, [[BOUNDRY_STATE]] + states, src)
-        #v_filter = [t1 for t1, t2 in zip(viterbi_states, viterbi_states[1:]) if t1 != t2]
-        #v_filter.append(viterbi_states[-1])
-        v_filter = [vf[0] for vf in viterbi_states]
+        v = [vf[0] for vf in viterbi_states]
+        print ' '.join(v).decode('utf-8')
+        v_filter = [t1 for t1, t2 in zip(v, v[1:]) if t1 != t2]
+        v_filter.append(v_filter[-1])
         print ' '.join(v_filter).decode('utf-8')
         print ' '.join(src).decode('utf-8').strip()
         print ''
