@@ -230,7 +230,7 @@ if __name__ == '__main__':
         v = [vf[0] for vf in viterbi_states]
         print ' '.join(v).decode('utf-8')
         v_filter = [t1 for t1, t2 in zip(v, v[1:]) if t1 != t2]
-        v_filter.append(v_filter[-1])
+        v_filter.append(v[-1])
         print ' '.join(v_filter).decode('utf-8')
         print ' '.join(src).decode('utf-8').strip()
         print ''
