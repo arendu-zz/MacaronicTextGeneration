@@ -8,33 +8,34 @@ Q_key2state = {}
 Q_score2key = []
 
 
-def sub_array_match(span_list, string_list):
-    if span_list[0] in string_list:
-        idx = string_list.index(span_list[0])
+def sub_array_match(d_span, d_list):
+    if d_span[0] in d_list:
+        idx = d_list.index(d_span[0])
         # TODO: make this check depend on the current coverage vector
-        if ' '.join(span_list) == ' '.join(string_list[idx:idx + len(span_list)]):
-            new_c = [False] * idx + [True] * (len(span_list)) + [False] * (len(string_list) - (idx + len(span_list)))
+        if ' '.join(d_span) == ' '.join(d_list[idx:idx + len(d_span)]):
+            new_c = [False] * idx + [True] * (len(d_span)) + [False] * (len(d_list) - (idx + len(d_span)))
             # final_c = [i | j for i, j in zip(c, new_c)]
-            return new_c, ' '.join(span_list)
+            return new_c, (idx, idx + len(d_span))
         else:
-            return [False] * len(string_list), None
+            return [False] * len(d_list), None
     else:
-        return [False] * len(string_list), None
+        return [False] * len(d_list), None
 
 
-def find_de_match(span, d_list, e_list):
-    de_spans = list(en2de[span])
-    if len(span.split()) == 1:
-        print 'single word'
-    de_spans.sort(reverse=True)
-    for score_d, d_span in de_spans:
-        coverage_de_new, match_str = sub_array_match(d_span.split(), d_list)
-        if match_str is not None:
-            print '\tMatch:', span, '--->', match_str
-            coverage_en_new = [(s_idx <= i < s_idx + k) for i, t in enumerate(e_list)]
-            return coverage_de_new, coverage_en_new, str(span + ' ---> ' + match_str), True
-    print '\tNo Match:', span, '--->', 'NULL'
-    return [False] * len(d_list), [False] * len(e_list), None, False
+def find_match_in_source(target_span, cs):
+    global en2de
+    span_target_str = ' '.join(cs.target[target_span[0]:target_span[1]])
+    if span_target_str in en2de:
+        source_spans = list(en2de[span_target_str])
+        source_spans.sort(reverse=True)
+        for score_d, source_span in source_spans:
+            cov_source_new, source_matched_span = sub_array_match(source_span.split(), cs.source)
+            if source_matched_span is not None:
+                cov_target_new = [(target_span[0] <= i < target_span[1]) for i, t in enumerate(cs.target)]
+                return cov_source_new, cov_target_new, source_matched_span
+    else:
+        pass  # target span not in dictionary
+    return [False] * len(cs.source), [False] * len(cs.target), None
 
 
 def pop_from_q():
@@ -68,6 +69,35 @@ def add_to_q(new_cs):
         print 'len of Q', len(Q_key2state)
 
 
+def find_alignments(start_state):
+    global Q_key2state
+    Q_key2state = {}
+    add_to_q(start_state)
+    while len(Q_key2state) > 0:
+        cs = pop_from_q()
+        if False not in cs.state_key():
+            print 'completed result:', cs.state_key(), 'score:', cs.score
+            pprint(cs.alignments)
+            return cs
+        else:
+            s_idx = cs.cov_target.index(False)
+            for k in range(2, 0, -1):
+                span_target = (s_idx, s_idx + k)
+                new_cov_source, new_cov_target, source_span_match = find_match_in_source(span_target, cs)
+                if source_span_match is not None:
+                    new_cs = cs.get_copy()  # SegmentState.SegmentState(e_list, d_list, cs.score + 1)
+                    new_cs.score += 1
+                    new_cs.cov_source = [i | j for i, j in zip(cs.cov_source, new_cov_source)]
+                    new_cs.cov_target = [i | j for i, j in zip(cs.cov_target, new_cov_target)]
+                    target_span = (s_idx, s_idx + k)
+                    new_cs.add_alignment(target_span, source_span_match)
+                    # if False not in new_cs.cov_source and False not in new_cs.cov_target:
+                    # completed_states.append(new_cs)
+                    # print 'added completed state'
+                    # else:
+                    add_to_q(new_cs)
+
+
 if __name__ == "__main__":
     phrase_table_file = open('data/coursera-large/model/phrase-table', 'r').readlines()
     train_en = open('data/coursera-large/train.clean.tok.en', 'r').readlines()
@@ -93,40 +123,12 @@ if __name__ == "__main__":
         en2de[en].add((score, de))
         de2en[de].add((score, en))
     """
-    global Q_key2state
-    Q_key2state = {}
-    e_list = train_en[0]
-    d_list = train_de[0]
-    e_list = e_list.split()
-    d_list = d_list.split()
-    init_state = SegmentState.SegmentState(e_list, d_list, 0.0)
-    add_to_q(init_state)
+    start_state = SegmentState.SegmentState(train_en[0].split(), train_de[0].split(), 0.0)
+    final_state = find_alignments(start_state)
+    print 'found alignments:'
+    for a in final_state.display_alignment():
+        print '\t', a
 
-    while len(Q_key2state) > 0:
-        cs = pop_from_q()
-        if False not in cs.state_key():
-            print 'best result:', cs.state_key(), 'score:', cs.score
-            pprint(cs.alignments)
-            break;
-        else:
-            s_idx = cs.cov_target.index(False)
-            for k in range(2, 0, -1):
-                span_target = ' '.join(cs.target[s_idx:s_idx + k])
-                if span_target in en2de:
-                    new_cov_source, new_cov_target, spans_matched, has_match = find_de_match(span_target, cs.source,
-                                                                                             cs.target)
-                    if has_match:
-                        new_cs = cs.get_copy()  # SegmentState.SegmentState(e_list, d_list, cs.score + 1)
-                        new_cs.score += 1
-                        new_cs.cov_source = [i | j for i, j in zip(cs.cov_source, new_cov_source)]
-                        new_cs.cov_target = [i | j for i, j in zip(cs.cov_target, new_cov_target)]
-                        new_cs.add_alignment(spans_matched)
-                        # if False not in new_cs.cov_source and False not in new_cs.cov_target:
-                        # completed_states.append(new_cs)
-                        # print 'added completed state'
-                        # else:
-                        add_to_q(new_cs)
-    print 'found alignments'
 
 
 

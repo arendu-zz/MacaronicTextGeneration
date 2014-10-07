@@ -1,4 +1,5 @@
 __author__ = 'arenduchintala'
+from collections import defaultdict
 
 
 class SegmentState:
@@ -35,8 +36,14 @@ class SegmentState:
     def state_key(self):
         return tuple(self.cov_source + self.cov_target)
 
-    def add_alignment(self, span_matched):
-        self.alignments.append(span_matched)
+    def add_alignment(self, target_span, source_span):
+        self.alignments.append((target_span, source_span))
+
+    def display_alignment(self):
+
+        for a in self.alignments:
+            (t_span, s_span) = a
+            yield ' '.join(self.target[t_span[0]:t_span[1]]), ' ---> ', ' '.join(self.source[s_span[0]:s_span[1]])
 
     def get_copy(self):
         new_state = SegmentState(self.target, self.source, self.score)
