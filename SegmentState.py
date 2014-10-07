@@ -26,15 +26,10 @@ class SegmentState:
                 return False
         return True
 
-    def disp_state(self):
-        bt = [str(int(t)) for t in self.cov_target]
-        bs = [str(int(s)) for s in self.cov_source]
-        print self.score
-        print ''.join(bt)
-        print ''.join(bs)
-
     def state_key(self):
-        return tuple(self.cov_source + self.cov_target)
+        bt = ''.join(str(int(t)) for t in self.cov_target)
+        bs = ''.join(str(int(s)) for s in self.cov_source)
+        return bt + bs
 
     def add_alignment(self, target_span, source_span):
         self.alignments.append((target_span, source_span))

@@ -42,7 +42,7 @@ def pop_from_q():
     Q_score2key.sort()
     (score, cs_key) = Q_score2key.pop()
     cs = Q_key2state.pop(cs_key)
-    print 'popped state', len(Q_key2state)
+    # print 'popped state', len(Q_key2state)
     return cs
 
 
@@ -55,33 +55,37 @@ def add_to_q(new_cs):
             Q_key2state[existing_key] = new_cs
             Q_score2key.remove((old_cs.score, existing_key))
             Q_score2key.append((new_cs.score, existing_key))
-            print 'replaced state', new_cs.state_key()
+            print '******************************replaced state************************', new_cs.state_key()
             print 'len of Q', len(Q_key2state)
         else:
-            print 'ignored state', new_cs.state_key()
-            print 'len of Q', len(Q_key2state)
+            # print 'ignored state', new_cs.state_key()
+            # print 'len of Q', len(Q_key2state)
             pass  # there is a same state with lower score
     else:
-        pprint(Q_key2state.keys())
         Q_key2state[new_cs.state_key()] = new_cs
         Q_score2key.append((new_cs.score, new_cs.state_key()))
-        print 'adding state', new_cs.state_key()
-        print 'len of Q', len(Q_key2state)
+        # print 'adding state', new_cs.state_key()
+        # print 'len of Q', len(Q_key2state)
 
 
 def find_alignments(start_state):
     global Q_key2state
     Q_key2state = {}
+    solutions = {}
     add_to_q(start_state)
     while len(Q_key2state) > 0:
         cs = pop_from_q()
-        if False not in cs.state_key():
+        if "0" not in cs.state_key() or False not in cs.cov_target:
             print 'completed result:', cs.state_key(), 'score:', cs.score
-            pprint(cs.alignments)
-            return cs
+            solutions[cs.score] = cs
+            print 'found alignment with score:', cs.score
+            for a in cs.display_alignment():
+                print '\t', a
+            print 'ok'
         else:
             s_idx = cs.cov_target.index(False)
-            for k in range(2, 0, -1):
+            # print 'S_IDX:', s_idx, '/', len(cs.cov_target)
+            for k in range(5, 0, -1):
                 span_target = (s_idx, s_idx + k)
                 new_cov_source, new_cov_target, source_span_match = find_match_in_source(span_target, cs)
                 if source_span_match is not None:
@@ -95,7 +99,12 @@ def find_alignments(start_state):
                     # completed_states.append(new_cs)
                     # print 'added completed state'
                     # else:
+                    if new_cs.state_key == cs.state_key:
+                        print ' has a match, but the coverage has not changed'
                     add_to_q(new_cs)
+                else:
+                    pass
+    return solutions
 
 
 if __name__ == "__main__":
@@ -113,7 +122,7 @@ if __name__ == "__main__":
             score = scores[0] * scores[1] + scores[2] * scores[3]
             en2de[en].add((score, de))
             de2en[de].add((score, en))
-    """
+
     lex_file = open('data/coursera-large/model/lex.e2f', 'r').readlines()
     for l in lex_file:
         parts = l.split()
@@ -122,12 +131,13 @@ if __name__ == "__main__":
         score = float(parts[2])
         en2de[en].add((score, de))
         de2en[de].add((score, en))
-    """
-    start_state = SegmentState.SegmentState(train_en[0].split(), train_de[0].split(), 0.0)
-    final_state = find_alignments(start_state)
-    print 'found alignments:'
-    for a in final_state.display_alignment():
-        print '\t', a
+
+    start_state = SegmentState.SegmentState(train_en[100].split(), train_de[100].split(), 0.0)
+    solutions = find_alignments(start_state)
+    for s in solutions:
+        print 'found alignment with score:', s
+        for a in solutions[s].display_alignment():
+            print '\t', a
 
 
 
