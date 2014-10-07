@@ -1,6 +1,7 @@
 __author__ = 'arenduchintala'
 from collections import defaultdict
 import SegmentState
+from pprint import pprint
 
 global Q_key2state, Q_score2key
 Q_key2state = {}
@@ -53,14 +54,18 @@ def add_to_q(new_cs):
             Q_key2state[existing_key] = new_cs
             Q_score2key.remove((old_cs.score, existing_key))
             Q_score2key.append((new_cs.score, existing_key))
-            print 'replaced state', len(Q_key2state)
+            print 'replaced state', new_cs.state_key()
+            print 'len of Q', len(Q_key2state)
         else:
-            print 'ignored state', len(Q_key2state)
+            print 'ignored state', new_cs.state_key()
+            print 'len of Q', len(Q_key2state)
             pass  # there is a same state with lower score
     else:
+        pprint(Q_key2state.keys())
         Q_key2state[new_cs.state_key()] = new_cs
         Q_score2key.append((new_cs.score, new_cs.state_key()))
-        print 'added state', len(Q_key2state)
+        print 'adding state', new_cs.state_key()
+        print 'len of Q', len(Q_key2state)
 
 
 if __name__ == "__main__":
@@ -96,25 +101,30 @@ if __name__ == "__main__":
     d_list = d_list.split()
     init_state = SegmentState.SegmentState(e_list, d_list, 0.0)
     add_to_q(init_state)
-    completed_states = []
+
     while len(Q_key2state) > 0:
         cs = pop_from_q()
-        s_idx = cs.cov_target.index(False)
-        for k in range(3, 0, -1):
-            span_target = ' '.join(cs.target[s_idx:s_idx + k])
-            if span_target in en2de:
-                new_cov_source, new_cov_target, spans_matched, has_match = find_de_match(span_target, cs.source,
-                                                                                         cs.target)
-                if has_match:
-                    new_cs = cs.get_copy()  # SegmentState.SegmentState(e_list, d_list, cs.score + 1)
-                    new_cs.score += 1
-                    new_cs.cov_source = [i | j for i, j in zip(cs.cov_source, new_cov_source)]
-                    new_cs.cov_target = [i | j for i, j in zip(cs.cov_target, new_cov_target)]
-                    new_cs.add_alignment(spans_matched)
-                    if False not in new_cs.cov_source and False not in new_cs.cov_target:
-                        completed_states.append(new_cs)
-                        print 'added completed state'
-                    else:
+        if False not in cs.state_key():
+            print 'best result:', cs.state_key(), 'score:', cs.score
+            pprint(cs.alignments)
+            break;
+        else:
+            s_idx = cs.cov_target.index(False)
+            for k in range(2, 0, -1):
+                span_target = ' '.join(cs.target[s_idx:s_idx + k])
+                if span_target in en2de:
+                    new_cov_source, new_cov_target, spans_matched, has_match = find_de_match(span_target, cs.source,
+                                                                                             cs.target)
+                    if has_match:
+                        new_cs = cs.get_copy()  # SegmentState.SegmentState(e_list, d_list, cs.score + 1)
+                        new_cs.score += 1
+                        new_cs.cov_source = [i | j for i, j in zip(cs.cov_source, new_cov_source)]
+                        new_cs.cov_target = [i | j for i, j in zip(cs.cov_target, new_cov_target)]
+                        new_cs.add_alignment(spans_matched)
+                        # if False not in new_cs.cov_source and False not in new_cs.cov_target:
+                        # completed_states.append(new_cs)
+                        # print 'added completed state'
+                        # else:
                         add_to_q(new_cs)
     print 'found alignments'
 
