@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
 __author__ = 'arenduchintala'
 from collections import defaultdict
 import SegmentState
-import pdb
+import BisegmentationSolutionTree as BST
 
-global Q_key2state, Q_score2key
+global Q_key2state, Q_score2key, Q_recursion
 Q_key2state = {}
 Q_score2key = []
+Q_recursion = []
 
 
 def sub_array_match(d_span, d_list, d_cov):
@@ -63,7 +65,7 @@ def pop_from_q():
     Q_score2key.sort()
     (score, cs_key) = Q_score2key.pop()
     cs = Q_key2state.pop(cs_key)
-    # print 'popped state', len(Q_key2state)
+    # print 'popped state', score
     return cs
 
 
@@ -92,30 +94,39 @@ def add_to_q(new_cs):
     else:
         Q_key2state[new_cs.state_key()] = new_cs
         Q_score2key.append((new_cs.get_score(), new_cs.state_key()))
-        # print 'adding state', new_cs.state_key()
+        # print '*************adding state*************', new_cs.state_key()
         # print 'len of Q', len(Q_key2state)
 
 
 def find_alignments(start_state, phrase_table):
-    global Q_key2state
+    global Q_key2state, Q_score2key
     Q_key2state = {}
-    solutions = {}
+    Q_score2key = []
+    # solutions = {}
+    best_solution = None
+    MAX_K = 6 if len(start_state.target) > 6 else len(start_state.target) - 1
     add_to_q(start_state)
     while len(Q_key2state) > 0:
         cs = pop_from_q()
         # "0" not in cs.state_key() or
         if False not in cs.cov_target:
-            print 'completed result:', cs.state_key(), 'score:', cs.get_score()
-            solutions[cs.get_score()] = cs
-            # pdb.set_trace()
-            # print 'found alignment with score:', cs.get_score()
-            # cs.display_alignment()
-            # print 'ok'
+            # print 'completed result:', cs.state_key(), 'score:', cs.get_score()
+            # solutions[cs.get_score()] = cs
+            if best_solution is None:
+                best_solution = cs
+            elif cs.get_score() < best_solution.get_score():
+                best_solution = cs
+            else:
+                pass
+                # pdb.set_trace()
+                # print 'found alignment with score:', cs.get_score()
+                # cs.display_alignment()
+                # print 'ok'
         else:
             s_idx = cs.cov_target.index(False)
             # print 'S_IDX:', s_idx, '/', len(cs.cov_target)
             got_match = False
-            for k in range(6, 0, -1):
+            for k in range(MAX_K, 0, -1):
                 span_target = (s_idx, s_idx + k)
                 update_cov_source, update_cov_target, source_span_match = find_match_in_source(span_target, cs,
                                                                                                phrase_table)
@@ -142,14 +153,16 @@ def find_alignments(start_state, phrase_table):
                 source_span_match = (None, None)
                 new_cs.add_alignment(target_span, source_span_match)
                 add_to_q(new_cs)
-
-    return solutions
+    # scores = sorted(solutions)
+    # best_score = scores[0]
+    return best_solution  # solutions[best_score]
 
 
 if __name__ == "__main__":
-    phrase_table_file = open('data/coursera-large/model/phrase-table', 'r').readlines()
-    train_en = open('data/coursera-large/train.clean.tok.en', 'r').readlines()
-    train_de = open('data/coursera-large/train.clean.tok.es', 'r').readlines()
+    data_set = 'coursera-large'
+    phrase_table_file = open('data/' + data_set + '/model/phrase-table', 'r').readlines()
+    train_en = open('data/' + data_set + '/train.clean.tok.en', 'r').readlines()
+    train_de = open('data/' + data_set + '/train.clean.tok.es', 'r').readlines()
     en2de = defaultdict(set)
     de2en = defaultdict(set)
     for pt in phrase_table_file:
@@ -162,7 +175,7 @@ if __name__ == "__main__":
             en2de[en].add((score, de))
             de2en[de].add((score, en))
 
-    lex_file = open('data/coursera-large/model/lex.e2f', 'r').readlines()
+    lex_file = open('data/' + data_set + '/model/lex.e2f', 'r').readlines()
     for l in lex_file:
         parts = l.split()
         en = parts[0].strip()
@@ -170,21 +183,33 @@ if __name__ == "__main__":
         score = float(parts[2])
         en2de[en].add((score, de))
         de2en[de].add((score, en))
-
-    idx = 2
-    target_l = train_de[idx].split()
-    source_l = train_en[idx].split()
+    print 'read data completed...'
+    idx = 100
+    target_l = train_en[idx].split()
+    source_l = train_de[idx].split()
+    phrase_table = en2de
     start_state = SegmentState.SegmentState(target_l, source_l)
-    solutions = find_alignments(start_state, de2en)
-    print '\n**** SOLUTIONS****'
+    # best_solution = find_alignments(start_state, phrase_table)
+    # print '\n**** BEST SOLUTION ****'
+    # print 'best alignment with score:', best_solution.get_score()
+    # print '\t', ' '.join(best_solution.target)
+    # print '\t', ' '.join(best_solution.source)
+    # print '\t', best_solution.state_key()
 
-    for s in sorted(solutions):
-        print 'found alignment with score:', s
-        print '\t', ' '.join(solutions[s].target)
-        print '\t', ' '.join(solutions[s].source)
-        print '\t', solutions[s].state_key()
-        solutions[s].display_alignment()
-        break
+    Q_recursion.append(start_state)
+    # print 'pushed', start_state.target, start_state.source
+    while len(Q_recursion) > 0:
+        current_solution = Q_recursion.pop()
+        # print 'popped', current_solution.target, current_solution.source
+        best_solution = find_alignments(current_solution, phrase_table)
+        alignment_strings = best_solution.get_alignment_strings()
+        print ' '.join(current_solution.target), '--->', ' '.join(current_solution.source)
+        for a in alignment_strings:
+            print '\t\t\t', ' '.join(alignment_strings[a][0]), ' ---> ', ' '.join(alignment_strings[a][1])
+            if len(alignment_strings[a][0]) > 1:
+                new_recursion_state = SegmentState.SegmentState(alignment_strings[a][0], alignment_strings[a][1])
+                Q_recursion.append(new_recursion_state)
+                # print 'pushed', new_recursion_state.target, new_recursion_state.source
 
 
 

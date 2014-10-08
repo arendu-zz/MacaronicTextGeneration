@@ -39,15 +39,16 @@ class SegmentState:
     def add_alignment(self, target_span, source_span):
         self.alignments.append((target_span, source_span))
 
-    def display_alignment(self):
+    def get_alignment_strings(self):
+        alignment_strings = {}
         for a in self.alignments:
             (t_span, s_span) = a
             if s_span[0] is None and s_span[1] is None:
-                print '\t', (t_span, s_span), '\t\t', ' '.join(self.target[t_span[0]:t_span[1]]), ' ---> ', 'NULL'
+                alignment_strings[(t_span, s_span)] = (self.target[t_span[0]:t_span[1]], ["NULL"])
             else:
-                print '\t', (t_span, s_span), '\t\t', ' '.join(self.target[t_span[0]:t_span[1]]), ' ---> ', ' '.join(
-                    self.source[s_span[0]:s_span[1]])
-
+                alignment_strings[(t_span, s_span)] = (
+                    self.target[t_span[0]:t_span[1]], self.source[s_span[0]:s_span[1]])
+        return alignment_strings
 
     def get_copy(self):
         new_state = SegmentState(self.target, self.source)
