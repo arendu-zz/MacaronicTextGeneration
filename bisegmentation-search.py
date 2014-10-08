@@ -159,10 +159,10 @@ def find_alignments(start_state, phrase_table):
 
 
 if __name__ == "__main__":
-    data_set = 'coursera-large'
+    data_set = 'moses-files-tok'  # 'coursera-large'
     phrase_table_file = open('data/' + data_set + '/model/phrase-table', 'r').readlines()
     train_en = open('data/' + data_set + '/train.clean.tok.en', 'r').readlines()
-    train_de = open('data/' + data_set + '/train.clean.tok.es', 'r').readlines()
+    train_de = open('data/' + data_set + '/train.clean.tok.de', 'r').readlines()
     en2de = defaultdict(set)
     de2en = defaultdict(set)
     for pt in phrase_table_file:
@@ -184,34 +184,48 @@ if __name__ == "__main__":
         en2de[en].add((score, de))
         de2en[de].add((score, en))
     print 'read data completed...'
-    idx = 100
-    target_l = train_en[idx].split()
-    source_l = train_de[idx].split()
-    phrase_table = en2de
-    start_state = SegmentState.SegmentState(target_l, source_l)
-    # best_solution = find_alignments(start_state, phrase_table)
-    # print '\n**** BEST SOLUTION ****'
-    # print 'best alignment with score:', best_solution.get_score()
-    # print '\t', ' '.join(best_solution.target)
-    # print '\t', ' '.join(best_solution.source)
-    # print '\t', best_solution.state_key()
-
-    Q_recursion.append(start_state)
-    # print 'pushed', start_state.target, start_state.source
-    while len(Q_recursion) > 0:
-        current_solution = Q_recursion.pop()
-        # print 'popped', current_solution.target, current_solution.source
-        best_solution = find_alignments(current_solution, phrase_table)
+    for idx in range(20):
+        """
+        # Single level solutions
+        idx = 0
+        target_l = train_en[idx].split()
+        source_l = train_de[idx].split()
+        phrase_table = en2de
+        start_state = SegmentState.SegmentState(target_l, source_l)
+        best_solution = find_alignments(start_state, phrase_table)
+        print '\n**** BEST SOLUTION ****'
+        print 'best alignment with score:', best_solution.get_score()
+        print '\t', ' '.join(best_solution.target)
+        print '\t', ' '.join(best_solution.source)
+        print '\t', best_solution.state_key()
         alignment_strings = best_solution.get_alignment_strings()
-        print ' '.join(current_solution.target), '--->', ' '.join(current_solution.source)
         for a in alignment_strings:
             print '\t\t\t', ' '.join(alignment_strings[a][0]), ' ---> ', ' '.join(alignment_strings[a][1])
-            if len(alignment_strings[a][0]) > 1:
-                new_recursion_state = SegmentState.SegmentState(alignment_strings[a][0], alignment_strings[a][1])
-                Q_recursion.append(new_recursion_state)
-                # print 'pushed', new_recursion_state.target, new_recursion_state.source
+        """
 
-
+        # recursive solution
+        print '********', 'SOLUTION FOR', idx, '********'
+        target_l = train_en[idx].split()
+        source_l = train_de[idx].split()
+        phrase_table = en2de
+        start_state = SegmentState.SegmentState(target_l, source_l)
+        Q_recursion.append(start_state)
+        # print 'pushed', start_state.target, start_state.source
+        while len(Q_recursion) > 0:
+            current_solution = Q_recursion.pop()
+            # print 'popped', current_solution.target, current_solution.source
+            best_solution = find_alignments(current_solution, phrase_table)
+            alignment_strings = best_solution.get_alignment_strings()
+            print ' '.join(current_solution.target), '--->', ' '.join(current_solution.source)
+            to_add = []
+            for a in alignment_strings:
+                print '\t\t\t', ' '.join(alignment_strings[a][0]), ' ---> ', ' '.join(alignment_strings[a][1])
+                if len(alignment_strings[a][0]) > 1:
+                    new_recursion_state = SegmentState.SegmentState(alignment_strings[a][0], alignment_strings[a][1])
+                    to_add.append(new_recursion_state)
+                    # print 'pushed', new_recursion_state.target, new_recursion_state.source
+            for ta in reversed(to_add):
+                Q_recursion.append(ta)
 
 
 
