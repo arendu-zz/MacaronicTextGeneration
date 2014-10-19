@@ -2,13 +2,19 @@ __author__ = 'arenduchintala'
 
 
 class SegmentState:
-    def __init__(self, target, source):
+    def __init__(self, target_span, source_span, target, source):
+        self.target_span = target_span
+        self.source_span = source_span
         self.target = target
         self.source = source
         self.cov_target = [False] * len(target)
         self.cov_source = [False] * len(source)
         self.alignments = []
+        self.child_states = []
 
+    def __str__(self):
+        return str(self.target_span) + ' ' + ' '.join(self.target) + ' ---> ' + str(
+            self.source_span) + ' ' + ' '.join(self.source)
 
     def update_cov_target(self, uct):
         self.cov_target = [i | j for i, j in zip(uct, self.cov_target)]
@@ -51,7 +57,7 @@ class SegmentState:
         return alignment_strings
 
     def get_copy(self):
-        new_state = SegmentState(self.target, self.source)
+        new_state = SegmentState(self.target_span, self.source_span, self.target, self.source)
         new_state.cov_target = [t for t in self.cov_target]
         new_state.cov_source = [s for s in self.cov_source]
         new_state.alignments = [a for a in self.alignments]

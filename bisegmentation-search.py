@@ -104,7 +104,7 @@ def find_alignments(start_state, phrase_table):
     Q_score2key = []
     # solutions = {}
     best_solution = None
-    MAX_K = 6 if len(start_state.target) > 6 else len(start_state.target) - 1
+    MAX_K = 7 if len(start_state.target) > 6 else len(start_state.target) - 1
     add_to_q(start_state)
     while len(Q_key2state) > 0:
         cs = pop_from_q()
@@ -127,14 +127,18 @@ def find_alignments(start_state, phrase_table):
             # print 'S_IDX:', s_idx, '/', len(cs.cov_target)
             got_match = False
             for k in range(MAX_K, 0, -1):
-                span_target = (s_idx, s_idx + k)
+                st_idx = s_idx
+                end_idx = s_idx + k if s_idx + k < len(cs.target) else len(cs.target)
+                span_target = (st_idx, end_idx)
                 update_cov_source, update_cov_target, source_span_match = find_match_in_source(span_target, cs,
                                                                                                phrase_table)
                 if source_span_match is not None:
                     new_cs = cs.get_copy()  # SegmentState.SegmentState(e_list, d_list, cs.get_score() + 1)
                     new_cs.cov_source = [i | j for i, j in zip(cs.cov_source, update_cov_source)]
                     new_cs.cov_target = [i | j for i, j in zip(cs.cov_target, update_cov_target)]
-                    target_span = (s_idx, s_idx + k)
+                    st_idx = s_idx
+                    end_idx = s_idx + k if s_idx + k < len(new_cs.target) else len(new_cs.target)
+                    target_span = (st_idx, end_idx)
                     new_cs.add_alignment(target_span, source_span_match)
                     # if False not in new_cs.cov_source and False not in new_cs.cov_target:
                     # completed_states.append(new_cs)
@@ -149,7 +153,9 @@ def find_alignments(start_state, phrase_table):
                 new_cs = cs.get_copy()
                 update_cov_target = [s_idx <= i < s_idx + 1 for i in range(len(cs.cov_target))]
                 new_cs.cov_target = [i | j for i, j in zip(cs.cov_target, update_cov_target)]
-                target_span = (s_idx, s_idx + k)
+                st_idx = s_idx
+                end_idx = s_idx + k if s_idx + k < len(new_cs.target) else len(new_cs.target)
+                target_span = (st_idx, end_idx)
                 source_span_match = (None, None)
                 new_cs.add_alignment(target_span, source_span_match)
                 add_to_q(new_cs)
@@ -159,10 +165,10 @@ def find_alignments(start_state, phrase_table):
 
 
 if __name__ == "__main__":
-    data_set = 'moses-files-tok'  # 'coursera-large'
+    data_set = 'coursera-large'  # 'moses-files-tok'
     phrase_table_file = open('data/' + data_set + '/model/phrase-table', 'r').readlines()
     train_en = open('data/' + data_set + '/train.clean.tok.en', 'r').readlines()
-    train_de = open('data/' + data_set + '/train.clean.tok.de', 'r').readlines()
+    train_de = open('data/' + data_set + '/train.clean.tok.es', 'r').readlines()
     en2de = defaultdict(set)
     de2en = defaultdict(set)
     for pt in phrase_table_file:
@@ -184,7 +190,7 @@ if __name__ == "__main__":
         en2de[en].add((score, de))
         de2en[de].add((score, en))
     print 'read data completed...'
-    for idx in range(20):
+    for idx in range(20)[15:16]:
         """
         # Single level solutions
         idx = 0
@@ -208,24 +214,32 @@ if __name__ == "__main__":
         target_l = train_en[idx].split()
         source_l = train_de[idx].split()
         phrase_table = en2de
-        start_state = SegmentState.SegmentState(target_l, source_l)
+        start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
+
         Q_recursion.append(start_state)
         # print 'pushed', start_state.target, start_state.source
         while len(Q_recursion) > 0:
             current_solution = Q_recursion.pop()
-            # print 'popped', current_solution.target, current_solution.source
+            print(current_solution)
             best_solution = find_alignments(current_solution, phrase_table)
             alignment_strings = best_solution.get_alignment_strings()
-            print ' '.join(current_solution.target), '--->', ' '.join(current_solution.source)
             to_add = []
-            for a in alignment_strings:
-                print '\t\t\t', ' '.join(alignment_strings[a][0]), ' ---> ', ' '.join(alignment_strings[a][1])
+            for a in sorted(alignment_strings):
+                new_recursion_state = SegmentState.SegmentState(a[0], a[1],
+                                                                alignment_strings[a][0],
+                                                                alignment_strings[a][1])
+                print new_recursion_state
+                current_solution.child_states.append(new_recursion_state)
                 if len(alignment_strings[a][0]) > 1:
-                    new_recursion_state = SegmentState.SegmentState(alignment_strings[a][0], alignment_strings[a][1])
                     to_add.append(new_recursion_state)
+                else:
+                    pass  # dont recurse on single word phrases
                     # print 'pushed', new_recursion_state.target, new_recursion_state.source
             for ta in reversed(to_add):
                 Q_recursion.append(ta)
+
+        print 'ok done'
+
 
 
 
