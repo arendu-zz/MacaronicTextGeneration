@@ -62,3 +62,15 @@ class SegmentState:
         new_state.cov_source = [s for s in self.cov_source]
         new_state.alignments = [a for a in self.alignments]
         return new_state
+
+    def display_child_alignments(self, lvl):
+        if lvl == 0:
+            return '(' + ' '.join(self.target) + ' | ' + ' '.join(self.source) + ')'
+        if len(self.child_states) == 0:
+            return '(' + self.target[0] + ' | ' + self.source[0] + ')'
+        else:
+            self.child_states.sort(key=lambda x: x.target_span)
+            disp = []
+            for c in self.child_states:
+                disp.append(c.display_child_alignments(lvl - 1))
+            return ' '.join(disp)

@@ -104,7 +104,7 @@ def find_alignments(start_state, phrase_table):
     Q_score2key = []
     # solutions = {}
     best_solution = None
-    MAX_K = 7 if len(start_state.target) > 6 else len(start_state.target) - 1
+    MAX_K = 6 if len(start_state.target) > 6 else len(start_state.target) - 1
     add_to_q(start_state)
     while len(Q_key2state) > 0:
         cs = pop_from_q()
@@ -220,7 +220,7 @@ if __name__ == "__main__":
         # print 'pushed', start_state.target, start_state.source
         while len(Q_recursion) > 0:
             current_solution = Q_recursion.pop()
-            print(current_solution)
+            # print(current_solution)
             best_solution = find_alignments(current_solution, phrase_table)
             alignment_strings = best_solution.get_alignment_strings()
             to_add = []
@@ -228,17 +228,23 @@ if __name__ == "__main__":
                 new_recursion_state = SegmentState.SegmentState(a[0], a[1],
                                                                 alignment_strings[a][0],
                                                                 alignment_strings[a][1])
-                print new_recursion_state
+                # print new_recursion_state
                 current_solution.child_states.append(new_recursion_state)
                 if len(alignment_strings[a][0]) > 1:
                     to_add.append(new_recursion_state)
                 else:
-                    pass  # dont recurse on single word phrases
+                    pass  # don't recurse on single word phrases
                     # print 'pushed', new_recursion_state.target, new_recursion_state.source
             for ta in reversed(to_add):
                 Q_recursion.append(ta)
 
-        print 'ok done'
+        print 'print the alignments properly'
+        print start_state.display_child_alignments(0)
+        print start_state.display_child_alignments(1)
+        print start_state.display_child_alignments(2)
+        print start_state.display_child_alignments(3)
+        print start_state.display_child_alignments(4)
+
 
 
 
