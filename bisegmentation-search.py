@@ -3,6 +3,7 @@ __author__ = 'arenduchintala'
 from collections import defaultdict
 import SegmentState
 import BisegmentationSolutionTree as BST
+import PrintCuts
 
 global Q_key2state, Q_score2key, Q_recursion
 Q_key2state = {}
@@ -11,19 +12,6 @@ Q_recursion = []
 
 
 def sub_array_match(d_span, d_list, d_cov):
-    """
-    if d_span[0] in d_list:
-        idx = d_list.index(d_span[0])
-        # TODO: make this check depend on the current coverage vector
-        if ' '.join(d_span) == ' '.join(d_list[idx:idx + len(d_span)]):
-            new_c = [False] * idx + [True] * (len(d_span)) + [False] * (len(d_list) - (idx + len(d_span)))
-            # final_c = [i | j for i, j in zip(c, new_c)]
-            return new_c, (idx, idx + len(d_span))
-        else:
-            return [False] * len(d_list), None
-    else:
-        return [False] * len(d_list), None
-    """
     if d_span[0] in d_list:
         match_start_pt = -1
         matched_so_far = 0
@@ -165,10 +153,10 @@ def find_alignments(start_state, phrase_table):
 
 
 if __name__ == "__main__":
-    data_set = 'coursera-large'  # 'moses-files-tok'
+    data_set = 'moses-files-tok'  # 'coursera-large'
     phrase_table_file = open('data/' + data_set + '/model/phrase-table', 'r').readlines()
     train_en = open('data/' + data_set + '/train.clean.tok.en', 'r').readlines()
-    train_de = open('data/' + data_set + '/train.clean.tok.es', 'r').readlines()
+    train_de = open('data/' + data_set + '/train.clean.tok.de', 'r').readlines()
     en2de = defaultdict(set)
     de2en = defaultdict(set)
     for pt in phrase_table_file:
@@ -190,30 +178,13 @@ if __name__ == "__main__":
         en2de[en].add((score, de))
         de2en[de].add((score, en))
     print 'read data completed...'
-    for idx in range(20)[15:16]:
-        """
-        # Single level solutions
-        idx = 0
-        target_l = train_en[idx].split()
-        source_l = train_de[idx].split()
-        phrase_table = en2de
-        start_state = SegmentState.SegmentState(target_l, source_l)
-        best_solution = find_alignments(start_state, phrase_table)
-        print '\n**** BEST SOLUTION ****'
-        print 'best alignment with score:', best_solution.get_score()
-        print '\t', ' '.join(best_solution.target)
-        print '\t', ' '.join(best_solution.source)
-        print '\t', best_solution.state_key()
-        alignment_strings = best_solution.get_alignment_strings()
-        for a in alignment_strings:
-            print '\t\t\t', ' '.join(alignment_strings[a][0]), ' ---> ', ' '.join(alignment_strings[a][1])
-        """
+    for idx in range(25)[0:1]:
 
         # recursive solution
         print '********', 'SOLUTION FOR', idx, '********'
-        target_l = train_en[idx].split()
-        source_l = train_de[idx].split()
-        phrase_table = en2de
+        target_l = train_de[idx].split()
+        source_l = train_en[idx].split()
+        phrase_table = de2en
         start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
 
         Q_recursion.append(start_state)
@@ -229,7 +200,7 @@ if __name__ == "__main__":
                                                                 alignment_strings[a][0],
                                                                 alignment_strings[a][1])
                 # print new_recursion_state
-                current_solution.child_states.append(new_recursion_state)
+                current_solution.add_to_children(new_recursion_state)
                 if len(alignment_strings[a][0]) > 1:
                     to_add.append(new_recursion_state)
                 else:
@@ -239,12 +210,8 @@ if __name__ == "__main__":
                 Q_recursion.append(ta)
 
         print 'print the alignments properly'
-        print start_state.display_child_alignments(0)
-        print start_state.display_child_alignments(1)
-        print start_state.display_child_alignments(2)
-        print start_state.display_child_alignments(3)
-        print start_state.display_child_alignments(4)
-
+        start_state.display = True
+        PrintCuts.print_cuts(start_state)
 
 
 

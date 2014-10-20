@@ -1,21 +1,9 @@
 __author__ = 'arenduchintala'
-
-
-class Node():
-    def __init__(self, contents):
-        self.display = False
-        self.contents = contents
-        self.child_states = []
-
-    def __str__(self):
-        return self.contents
-
-    def deepcopy(self):
-        n = Node(self.contents)
-        n.display = self.display
-        for c in self.child_states:
-            n.child_states.append(c.deepcopy())
-        return n
+"""
+This script accepts a SegmentState object that is created by bisegmentation search.
+The SegmentState has recursivly bisegmented a bitext
+"""
+import SegmentState
 
 
 def get_state(root_node):
@@ -27,7 +15,7 @@ def get_state(root_node):
             state_bt += '1'
         else:
             state_bt += '0'
-        for c in current_node.child_states:
+        for c in current_node.get_children():
             S.append(c)
     return state_bt
 
@@ -36,11 +24,11 @@ def push_ticks(root_node, push_node):
     S = [root_node]
     while len(S) > 0:
         current_node = S.pop()
-        if current_node.contents == push_node.contents and len(current_node.child_states) > 0:
+        if str(current_node) == str(push_node) and len(current_node.get_children()) > 0:
             current_node.display = False
-            for c in current_node.child_states:
+            for c in current_node.get_children():
                 c.display = True
-        for c in current_node.child_states:
+        for c in current_node.get_children():
             S.append(c)
     return root_node
 
@@ -52,7 +40,7 @@ def display_ticks(root_node):
         current_node = S.pop()
         if current_node.display:
             display_items.append(current_node)
-        for c in current_node.child_states:
+        for c in current_node.get_children():
             S.append(c)
     return display_items
 
@@ -80,43 +68,19 @@ def pop_tree_stack():
     return rt
 
 
-if __name__ == '__main__':
-    # make tree
-    n1 = Node('A-4')
-    n2 = Node('B-3')
-    n3 = Node('C-2')
-    n4 = Node('D-1')
-    n12 = Node('AB-34')
-    n12.child_states = [n1, n2]
-    # n34 = Node('CD-12')
-    # n34.children = [n3, n4]
-    n1234 = Node('ABCD-1234')
-    n1234.child_states = [n12, n3, n4]
-    n1234.display = True
-
-    # print get_state(n1234)
-    # n1234 = push_ticks(n1234, n1234)
-    # print get_state(n1234)
-
-    push_tree_stack(n1234)
-
+def print_cuts(segmentstate):
+    push_tree_stack(segmentstate)
     while len(tree_stack) > 0:
-        current_tree = pop_tree_stack()
-        current_display_nodes = display_ticks(current_tree)
+        current_root = pop_tree_stack()
+        current_display_nodes = display_ticks(current_root)
+        current_display_nodes.sort(key=lambda x: x.target_span[0])
         disp = [str(i) for i in current_display_nodes]
-        print ' '.join(sorted(disp))
+        # print ' '.join(disp)
+        tar = [' '.join(i.target) for i in current_display_nodes]
+        src = [' '.join(i.source) for i in current_display_nodes]
+        print ' | '.join(tar)
+        print ' | '.join(src), '\n'
         for cdn in current_display_nodes:
-            root_cpy = current_tree.deepcopy()
-            # print get_state(root_cpy)
-            root_cpy = push_ticks(root_cpy, cdn)
-            # print get_state(root_cpy)
+            root_cpy = current_root.deepcopy()
+            push_ticks(root_cpy, cdn)
             push_tree_stack(root_cpy)
-
-
-
-
-
-
-
-    
-

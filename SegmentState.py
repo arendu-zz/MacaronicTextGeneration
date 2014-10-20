@@ -10,10 +10,11 @@ class SegmentState:
         self.cov_target = [False] * len(target)
         self.cov_source = [False] * len(source)
         self.alignments = []
-        self.child_states = []
+        self._child_states = []
+        self.display = False
 
     def __str__(self):
-        return str(self.target_span) + ' ' + ' '.join(self.target) + ' ---> ' + str(
+        return str(self.target_span) + ' ' + ' '.join(self.target) + ' -> ' + str(
             self.source_span) + ' ' + ' '.join(self.source)
 
     def update_cov_target(self, uct):
@@ -57,10 +58,12 @@ class SegmentState:
         return alignment_strings
 
     def get_copy(self):
-        new_state = SegmentState(self.target_span, self.source_span, self.target, self.source)
+        new_state = SegmentState(self.target_span, self.source_span,
+                                 self.target, self.source)
         new_state.cov_target = [t for t in self.cov_target]
         new_state.cov_source = [s for s in self.cov_source]
         new_state.alignments = [a for a in self.alignments]
+        new_state.display = self.display
         return new_state
 
     def display_child_alignments(self, lvl):
@@ -74,3 +77,40 @@ class SegmentState:
             for c in self.child_states:
                 disp.append(c.display_child_alignments(lvl - 1))
             return ' '.join(disp)
+
+    def get_state(self):
+        state_bt = ''
+        S = [self]
+        while len(S) > 0:
+            current_node = S.pop()
+            if current_node.display:
+                state_bt += '1'
+            else:
+                state_bt += '0'
+            for c in current_node.get_children():
+                S.append(c)
+        return state_bt
+
+    def get_children(self):
+        return self._child_states
+
+    def add_to_children(self, segmentstate):
+        # At this point we convert relative spans positions back to original span positions
+        # by adding the span start point of the parent (self is the parent)
+        if segmentstate.target_span == (None, None):
+            pass
+        else:
+            segmentstate.target_span = (segmentstate.target_span[0] + self.target_span[0],
+                                        segmentstate.target_span[1] + self.target_span[0])
+        if segmentstate.source_span == (None, None):
+            pass
+        else:
+            segmentstate.source_span = (segmentstate.source_span[0] + self.source_span[0],
+                                        segmentstate.source_span[1] + self.source_span[0])
+        self._child_states.append(segmentstate)
+
+    def deepcopy(self):
+        cpy = self.get_copy()
+        for c in self._child_states:
+            cpy._child_states.append(c.deepcopy())
+        return cpy
