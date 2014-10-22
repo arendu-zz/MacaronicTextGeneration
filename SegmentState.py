@@ -13,6 +13,9 @@ class SegmentState:
         self._child_states = []
         self.display = False
 
+    def get_children(self):
+        return self._child_states
+
     def __str__(self):
         return str(self.target_span) + ' ' + ' '.join(self.target) + ' -> ' + str(
             self.source_span) + ' ' + ' '.join(self.source)
@@ -68,15 +71,21 @@ class SegmentState:
 
     def display_child_alignments(self, lvl):
         if lvl == 0:
-            return '(' + ' '.join(self.target) + ' | ' + ' '.join(self.source) + ')'
-        if len(self.child_states) == 0:
-            return '(' + self.target[0] + ' | ' + self.source[0] + ')'
+            s = ' '.join(self.source)
+            t = ' '.join(self.target)
+            m = max(len(t), len(s)) + 1
+            return [(t.center(m), s.center(m))]
+        if len(self.get_children()) == 0:
+            s = self.source[0]
+            t = self.target[0]
+            m = max(len(t), len(s)) + 1
+            return [(t.center(m), s.center(m) )]
         else:
-            self.child_states.sort(key=lambda x: x.target_span)
+            self.get_children().sort(key=lambda x: x.target_span[0])
             disp = []
-            for c in self.child_states:
-                disp.append(c.display_child_alignments(lvl - 1))
-            return ' '.join(disp)
+            for c in self.get_children():
+                disp += c.display_child_alignments(lvl - 1)
+            return disp
 
     def get_state(self):
         state_bt = ''
@@ -91,8 +100,6 @@ class SegmentState:
                 S.append(c)
         return state_bt
 
-    def get_children(self):
-        return self._child_states
 
     def add_to_children(self, segmentstate):
         # At this point we convert relative spans positions back to original span positions

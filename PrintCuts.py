@@ -68,6 +68,22 @@ def pop_tree_stack():
     return rt
 
 
+def print_levels(segmentstate):
+    lvl = 0
+    d_prev = ()
+    cond = True
+    while cond:
+        d1 = tuple(segmentstate.display_child_alignments(lvl))
+        if d1 == d_prev:
+            cond = False
+        else:
+            d_prev = d1
+            t, f = zip(*d1)
+            print '|'.join(list(t))
+            print '|'.join(list(f))
+        lvl += 1
+
+
 def print_cuts(segmentstate):
     push_tree_stack(segmentstate)
     while len(tree_stack) > 0:
@@ -78,8 +94,12 @@ def print_cuts(segmentstate):
         # print ' '.join(disp)
         tar = [' '.join(i.target) for i in current_display_nodes]
         src = [' '.join(i.source) for i in current_display_nodes]
-        print ' | '.join(tar)
-        print ' | '.join(src), '\n'
+        for i in xrange(len(tar)):
+            m = max(len(tar[i]), len(src[i]))
+            tar[i] = tar[i].center(m)
+            src[i] = src[i].center(m)
+        print '|'.join(tar)
+        print '|'.join(src), '\n'
         for cdn in current_display_nodes:
             root_cpy = current_root.deepcopy()
             push_ticks(root_cpy, cdn)

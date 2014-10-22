@@ -2,8 +2,10 @@
 __author__ = 'arenduchintala'
 from collections import defaultdict
 import SegmentState
-import BisegmentationSolutionTree as BST
 import PrintCuts
+
+# TODO read pre-ordering rules in collens and koen
+# TODO: parse sentences synchronously - get parser from joshua
 
 global Q_key2state, Q_score2key, Q_recursion
 Q_key2state = {}
@@ -153,10 +155,10 @@ def find_alignments(start_state, phrase_table):
 
 
 if __name__ == "__main__":
-    data_set = 'moses-files-tok'  # 'coursera-large'
+    data_set = 'coursera-large'  # 'moses-files-tok'
     phrase_table_file = open('data/' + data_set + '/model/phrase-table', 'r').readlines()
     train_en = open('data/' + data_set + '/train.clean.tok.en', 'r').readlines()
-    train_de = open('data/' + data_set + '/train.clean.tok.de', 'r').readlines()
+    train_de = open('data/' + data_set + '/train.clean.tok.es', 'r').readlines()
     en2de = defaultdict(set)
     de2en = defaultdict(set)
     for pt in phrase_table_file:
@@ -178,40 +180,44 @@ if __name__ == "__main__":
         en2de[en].add((score, de))
         de2en[de].add((score, en))
     print 'read data completed...'
-    for idx in range(25)[0:1]:
+    for idx in range(25)[:]:
 
         # recursive solution
-        print '********', 'SOLUTION FOR', idx, '********'
+        print '****************', 'SOLUTION FOR', idx, '****************'
         target_l = train_de[idx].split()
         source_l = train_en[idx].split()
         phrase_table = de2en
-        start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
+        if len(target_l) < 20 and len(source_l) < 20:
 
-        Q_recursion.append(start_state)
-        # print 'pushed', start_state.target, start_state.source
-        while len(Q_recursion) > 0:
-            current_solution = Q_recursion.pop()
-            # print(current_solution)
-            best_solution = find_alignments(current_solution, phrase_table)
-            alignment_strings = best_solution.get_alignment_strings()
-            to_add = []
-            for a in sorted(alignment_strings):
-                new_recursion_state = SegmentState.SegmentState(a[0], a[1],
-                                                                alignment_strings[a][0],
-                                                                alignment_strings[a][1])
-                # print new_recursion_state
-                current_solution.add_to_children(new_recursion_state)
-                if len(alignment_strings[a][0]) > 1:
-                    to_add.append(new_recursion_state)
-                else:
-                    pass  # don't recurse on single word phrases
-                    # print 'pushed', new_recursion_state.target, new_recursion_state.source
-            for ta in reversed(to_add):
-                Q_recursion.append(ta)
+            start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
 
-        print 'print the alignments properly'
-        start_state.display = True
-        PrintCuts.print_cuts(start_state)
+            Q_recursion.append(start_state)
+            # print 'pushed', start_state.target, start_state.source
+            while len(Q_recursion) > 0:
+                current_solution = Q_recursion.pop()
+                # print(current_solution)
+                best_solution = find_alignments(current_solution, phrase_table)
+                alignment_strings = best_solution.get_alignment_strings()
+                to_add = []
+                for a in sorted(alignment_strings):
+                    new_recursion_state = SegmentState.SegmentState(a[0], a[1],
+                                                                    alignment_strings[a][0],
+                                                                    alignment_strings[a][1])
+                    # print new_recursion_state
+                    current_solution.add_to_children(new_recursion_state)
+                    if len(alignment_strings[a][0]) > 1:
+                        to_add.append(new_recursion_state)
+                    else:
+                        pass  # don't recurse on single word phrases
+                        # print 'pushed', new_recursion_state.target, new_recursion_state.source
+                for ta in reversed(to_add):
+                    Q_recursion.append(ta)
+            print'\n********TREE LEVELS********'
+            PrintCuts.print_levels(start_state)
+
+            print '\n********TREE CUTS********'
+            start_state.display = True
+            PrintCuts.print_cuts(start_state)
 
 
 
