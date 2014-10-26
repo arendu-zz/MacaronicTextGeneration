@@ -45,10 +45,10 @@ def find_match_in_source(target_span, cs, phrase_table):
             cov_source_new, source_matched_span = sub_array_match(source_span.split(), cs.source, cs.cov_source)
             if source_matched_span is not None:
                 cov_target_new = [(target_span[0] <= i < target_span[1]) for i, t in enumerate(cs.target)]
-                return cov_source_new, cov_target_new, source_matched_span
+                return cov_source_new, cov_target_new, source_matched_span, score_d
     else:
         pass  # target span not in dictionary
-    return [False] * len(cs.source), [False] * len(cs.target), None
+    return [False] * len(cs.source), [False] * len(cs.target), None, 0.0
 
 
 def pop_from_q():
@@ -120,8 +120,9 @@ def find_alignments(start_state, phrase_table):
                 st_idx = s_idx
                 end_idx = s_idx + k if s_idx + k < len(cs.target) else len(cs.target)
                 span_target = (st_idx, end_idx)
-                update_cov_source, update_cov_target, source_span_match = find_match_in_source(span_target, cs,
-                                                                                               phrase_table)
+                update_cov_source, update_cov_target, source_span_match, match_score = find_match_in_source(span_target,
+                                                                                                            cs,
+                                                                                                            phrase_table)
                 if source_span_match is not None:
                     new_cs = cs.get_copy()  # SegmentState.SegmentState(e_list, d_list, cs.get_score() + 1)
                     new_cs.cov_source = [i | j for i, j in zip(cs.cov_source, update_cov_source)]
@@ -129,7 +130,10 @@ def find_alignments(start_state, phrase_table):
                     st_idx = s_idx
                     end_idx = s_idx + k if s_idx + k < len(new_cs.target) else len(new_cs.target)
                     target_span = (st_idx, end_idx)
-                    new_cs.add_alignment(target_span, source_span_match)
+                    # here we calculate score by how many words in source are covered
+                    # new_cs.add_alignment(target_span, source_span_match, source_span_match[1] - source_span_match[0])
+                    # here we acually use the match_score provided by the find_match_in_source method
+                    new_cs.add_alignment(target_span, source_span_match, match_score)
                     # if False not in new_cs.cov_source and False not in new_cs.cov_target:
                     # completed_states.append(new_cs)
                     # print 'added completed state'
@@ -147,7 +151,7 @@ def find_alignments(start_state, phrase_table):
                 end_idx = s_idx + k if s_idx + k < len(new_cs.target) else len(new_cs.target)
                 target_span = (st_idx, end_idx)
                 source_span_match = (None, None)
-                new_cs.add_alignment(target_span, source_span_match)
+                new_cs.add_alignment(target_span, source_span_match, 0.0)
                 add_to_q(new_cs)
     # scores = sorted(solutions)
     # best_score = scores[0]
@@ -167,20 +171,37 @@ if __name__ == "__main__":
             en = parts[0].strip()
             de = parts[1].strip()
             scores = [float(sc) for sc in parts[2].split()]
-            score = scores[0] * scores[1] + scores[2] * scores[3]
+            # score = scores[0] * scores[1] + scores[2] * scores[3]
+            score = scores[0] * 0.5 + scores[2] * 0.5
             en2de[en].add((score, de))
             de2en[de].add((score, en))
 
     lex_file = open('data/' + data_set + '/model/lex.e2f', 'r').readlines()
+    lex_dict = {}
     for l in lex_file:
         parts = l.split()
         en = parts[0].strip()
         de = parts[1].strip()
         score = float(parts[2])
-        en2de[en].add((score, de))
-        de2en[de].add((score, en))
+        lex_dict[en, de] = score
+
+    lex_file_inv = open('data/' + data_set + '/model/lex.f2e', 'r').readlines()
+    lex_dict_inv = {}
+    for l in lex_file_inv:
+        parts = l.split()
+        de = parts[0].strip()
+        en = parts[1].strip()
+        score = float(parts[2])
+        lex_dict_inv[en, de] = score
+
+    for e, d in lex_dict:
+        score_e2f = lex_dict[e, d]
+        score_f2e = lex_dict_inv[e, d]
+        score = score_e2f * 0.5 + score_f2e * 0.5
+        en2de[e].add((score, d))
+        de2en[d].add((score, e))
     print 'read data completed...'
-    for idx in range(25)[:]:
+    for idx in range(25)[5:6]:
 
         # recursive solution
         print '****************', 'SOLUTION FOR', idx, '****************'
