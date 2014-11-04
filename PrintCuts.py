@@ -79,8 +79,8 @@ def print_levels(segmentstate):
         else:
             d_prev = d1
             t, f = zip(*d1)
-            print '|'.join(list(t))
-            print '|'.join(list(f))
+            print ' | '.join(list(t))
+            print ' | '.join(list(f)), '\n'
         lvl += 1
 
 
@@ -98,8 +98,8 @@ def print_cuts(segmentstate):
             m = max(len(tar[i]), len(src[i]))
             tar[i] = tar[i].center(m)
             src[i] = src[i].center(m)
-        print '|'.join(tar)
-        print '|'.join(src), '\n'
+        print ' | '.join(tar)
+        print ' | '.join(src), '\n'
         for cdn in current_display_nodes:
             root_cpy = current_root.deepcopy()
             push_ticks(root_cpy, cdn)

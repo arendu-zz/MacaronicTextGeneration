@@ -38,13 +38,18 @@ class SegmentState:
 
     def coverage_score(self):
         count_false = self.cov_source.count(False)
-        count_score = -sum([a[2] for a in self.alignments])
-        # count_score = len(self.source) - count_score
-        # assert count_score == count_false
+        return count_false
+
+    def probability_score(self):
+        if len(self.alignments) > 0:
+            count_score = -sum([a[2] for a in self.alignments]) / float(len(self.alignments))
+        else:
+            count_score = 0.0
         return count_score
 
+
     def get_score(self):
-        return self.coverage_score(), len(self.alignments)
+        return self.probability_score()
 
     def state_key(self):
         bt = ''.join(str(int(t)) for t in self.cov_target)
@@ -65,6 +70,22 @@ class SegmentState:
                     self.target[t_span[0]:t_span[1]], self.source[s_span[0]:s_span[1]])
         return alignment_strings
 
+    def display_alignment_strings(self):
+        a_str = self.get_alignment_strings()
+        t_spaced = []
+        s_spaced = []
+        for (t_span, s_span) in sorted(a_str):
+            (t, s) = a_str[(t_span, s_span)]
+            t_str = ' '.join(t)
+            s_str = ' '.join(s)
+            m = max(len(t_str), len(s_str)) + 1
+            t_spaced.append(t_str.center(m))
+            s_spaced.append(s_str.center(m))
+        print self.get_score()
+        print ' | '.join(t_spaced)
+        print ' | '.join(s_spaced)
+        pass
+
     def get_copy(self):
         new_state = SegmentState(self.target_span, self.source_span,
                                  self.target, self.source)
@@ -77,14 +98,19 @@ class SegmentState:
     def display_child_alignments(self, lvl):
         if lvl == 0:
             s = ' '.join(self.source)
+            s = s.strip()
             t = ' '.join(self.target)
-            m = max(len(t), len(s)) + 1
+            t = t.strip()
+            m = max(len(t), len(s))
             return [(t.center(m), s.center(m))]
         if len(self.get_children()) == 0:
             s = self.source[0]
+            s = s.strip()
             t = self.target[0]
-            m = max(len(t), len(s)) + 1
-            return [(t.center(m), s.center(m) )]
+            t = t.strip()
+            m = max(len(t), len(s))
+
+            return [(t.center(m), s.center(m))]
         else:
             self.get_children().sort(key=lambda x: x.target_span[0])
             disp = []

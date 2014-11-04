@@ -41,7 +41,7 @@ def find_match_in_source(target_span, cs, phrase_table):
     if span_target_str in phrase_table:
         source_spans = list(phrase_table[span_target_str])
         source_spans.sort(reverse=True)
-        for score_d, source_span in source_spans:
+        for score_d, source_span in source_spans[:50]:  # TODO: we can speed up here, only loop top K source_spans
             cov_source_new, source_matched_span = sub_array_match(source_span.split(), cs.source, cs.cov_source)
             if source_matched_span is not None:
                 cov_target_new = [(target_span[0] <= i < target_span[1]) for i, t in enumerate(cs.target)]
@@ -53,9 +53,8 @@ def find_match_in_source(target_span, cs, phrase_table):
 
 def pop_from_q():
     Q_score2key.sort()
-    (score, cs_key) = Q_score2key.pop()
+    (score, cs_key) = Q_score2key.pop(0)
     cs = Q_key2state.pop(cs_key)
-    # print 'popped state', score
     return cs
 
 
@@ -94,32 +93,39 @@ def find_alignments(start_state, phrase_table):
     Q_score2key = []
     # solutions = {}
     best_solution = None
-    MAX_K = 6 if len(start_state.target) > 6 else len(start_state.target) - 1
     add_to_q(start_state)
     while len(Q_key2state) > 0:
         cs = pop_from_q()
-        # "0" not in cs.state_key() or
+
         if False not in cs.cov_target:
             # print 'completed result:', cs.state_key(), 'score:', cs.get_score()
             # solutions[cs.get_score()] = cs
             if best_solution is None:
+                # print 'first solution:'
+                # cs.display_alignment_strings()
                 best_solution = cs
             elif cs.get_score() < best_solution.get_score():
+                # print 'found new best solution:'
+                # cs.display_alignment_strings()
                 best_solution = cs
             else:
-                pass
+                # print 'ignoring solution:'
+                # cs.display_alignment_strings()
                 # pdb.set_trace()
                 # print 'found alignment with score:', cs.get_score()
                 # cs.display_alignment()
                 # print 'ok'
+                pass
         else:
+            MAX_K = 6 if len(start_state.target) > 6 else len(start_state.target) - 1
             s_idx = cs.cov_target.index(False)
-            # print 'S_IDX:', s_idx, '/', len(cs.cov_target)
             got_match = False
             for k in range(MAX_K, 0, -1):
+
                 st_idx = s_idx
                 end_idx = s_idx + k if s_idx + k < len(cs.target) else len(cs.target)
                 span_target = (st_idx, end_idx)
+                # print 'k', k, span_target
                 update_cov_source, update_cov_target, source_span_match, match_score = find_match_in_source(span_target,
                                                                                                             cs,
                                                                                                             phrase_table)
@@ -132,7 +138,7 @@ def find_alignments(start_state, phrase_table):
                     target_span = (st_idx, end_idx)
                     # here we calculate score by how many words in source are covered
                     # new_cs.add_alignment(target_span, source_span_match, source_span_match[1] - source_span_match[0])
-                    # here we acually use the match_score provided by the find_match_in_source method
+                    # here we actually use the match_score provided by the find_match_in_source method
                     new_cs.add_alignment(target_span, source_span_match, match_score)
                     # if False not in new_cs.cov_source and False not in new_cs.cov_target:
                     # completed_states.append(new_cs)
@@ -142,7 +148,7 @@ def find_alignments(start_state, phrase_table):
                     got_match = True
                 else:
                     pass
-            if not got_match:
+            if not got_match or k == 1:
                 # print 'force a target ---> NULL alignment'
                 new_cs = cs.get_copy()
                 update_cov_target = [s_idx <= i < s_idx + 1 for i in range(len(cs.cov_target))]
@@ -159,10 +165,10 @@ def find_alignments(start_state, phrase_table):
 
 
 if __name__ == "__main__":
-    data_set = 'coursera-large'  # 'moses-files-tok'
+    data_set = 'moses-files-tok'  # 'coursera-large'
     phrase_table_file = open('data/' + data_set + '/model/phrase-table', 'r').readlines()
     train_en = open('data/' + data_set + '/train.clean.tok.en', 'r').readlines()
-    train_de = open('data/' + data_set + '/train.clean.tok.es', 'r').readlines()
+    train_de = open('data/' + data_set + '/train.clean.tok.de', 'r').readlines()
     en2de = defaultdict(set)
     de2en = defaultdict(set)
     for pt in phrase_table_file:
@@ -200,16 +206,22 @@ if __name__ == "__main__":
         score = score_e2f * 0.5 + score_f2e * 0.5
         en2de[e].add((score, d))
         de2en[d].add((score, e))
+
     print 'read data completed...'
-    for idx in range(25)[5:6]:
+
+    for idx in range(20)[:]:
 
         # recursive solution
-        print '****************', 'SOLUTION FOR', idx, '****************'
-        target_l = train_de[idx].split()
         source_l = train_en[idx].split()
+        target_l = train_de[idx].split()
+        # target_l = "señora presidenta , una cuestión de procedimiento .".split()
+        # source_l = "madam president , on a point of order .".split()
+        # = ['minute']
+        # = ['un', 'minuto']  # .split()
+
         phrase_table = de2en
         if len(target_l) < 20 and len(source_l) < 20:
-
+            print '****************', 'SOLUTION FOR', idx, '****************'
             start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
 
             Q_recursion.append(start_state)
@@ -218,6 +230,7 @@ if __name__ == "__main__":
                 current_solution = Q_recursion.pop()
                 # print(current_solution)
                 best_solution = find_alignments(current_solution, phrase_table)
+                # print 'best: ', best_solution.get_score()
                 alignment_strings = best_solution.get_alignment_strings()
                 to_add = []
                 for a in sorted(alignment_strings):
@@ -236,9 +249,9 @@ if __name__ == "__main__":
             print'\n********TREE LEVELS********'
             PrintCuts.print_levels(start_state)
 
-            print '\n********TREE CUTS********'
-            start_state.display = True
-            PrintCuts.print_cuts(start_state)
+            # print '\n********TREE CUTS********'
+            # start_state.display = True
+            # PrintCuts.print_cuts(start_state)
 
 
 
