@@ -1,5 +1,4 @@
 __author__ = 'arenduchintala'
-import pdb
 
 
 class SegmentState:
@@ -145,7 +144,7 @@ class SegmentState:
             if len(segmentstate.source_span) == 3 and len(segmentstate.source) == 1:
                 segmentstate.source[0] = segmentstate.source_span[2]
             else:
-                pdb.set_trace()
+                pass  # pdb.set_trace()
         else:
             segmentstate.source_span = (segmentstate.source_span[0] + self.source_span[0],
                                         segmentstate.source_span[1] + self.source_span[0])

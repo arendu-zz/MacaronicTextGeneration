@@ -4,7 +4,6 @@ from collections import defaultdict
 import SegmentState
 import PrintCuts
 from heapq import heappush, heapify, heappop, nlargest
-import pdb
 # TODO read pre-ordering rules in collens and koen
 # TODO: parse sentences synchronously - get parser from joshua
 
@@ -261,15 +260,15 @@ if __name__ == "__main__":
         # en2de[e].add((score, d))
         de2en[d].add((score, e))
         fillin[d].add((score, e))
-    pdb.set_trace()
+
     print 'read data completed...'
-    for idx in range(20)[:1]:
+    for idx in range(20)[:]:
 
         # recursive solution
         source_l = train_en[idx].split()  # English
         target_l = train_de[idx].split()  # German
         # target_l = "kolossalen Anstieg des".split()
-        #source_l = " huge increase in ".split()
+        # source_l = " huge increase in ".split()
         # = ['minute']
         # = ['un', 'minuto']  # .split()
 
