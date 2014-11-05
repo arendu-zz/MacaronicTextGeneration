@@ -3,11 +3,15 @@ __author__ = 'arenduchintala'
 from collections import defaultdict
 import SegmentState
 import PrintCuts
-
+from heapq import heappush, heapify, heappop, nlargest
+import pdb
 # TODO read pre-ordering rules in collens and koen
 # TODO: parse sentences synchronously - get parser from joshua
 
-global Q_key2state, Q_score2key, Q_recursion
+global Q_key2state, HQ_beam_width, Q_score2key, Q_recursion, HQ, HQ_key2state, fillin
+HQ_beam_width = 100
+HQ = []
+HQ_key2state = {}
 Q_key2state = {}
 Q_score2key = []
 Q_recursion = []
@@ -51,20 +55,61 @@ def find_match_in_source(target_span, cs, phrase_table):
     return [False] * len(cs.source), [False] * len(cs.target), None, 0.0
 
 
+"""
 def pop_from_q():
     Q_score2key.sort()
     (score, cs_key) = Q_score2key.pop(0)
     cs = Q_key2state.pop(cs_key)
     return cs
+"""
 
 
+def pop_from_heap():
+    global HQ, HQ_key2state
+    (score, state) = heappop(HQ)
+    HQ_key2state.pop(state.state_key())
+    return state
+
+
+def remove_from_heap(rm_state):
+    global HQ, HQ_key2state
+    # print 'removing', str(rm_state.state_key()), rm_state.get_score()
+    HQ.remove((rm_state.get_score(), rm_state))
+    HQ_key2state.pop(rm_state.state_key())
+    heapify(HQ)
+
+
+def add_to_heap(new_cs):
+    global HQ, HQ_key2state
+    if new_cs.state_key() in HQ_key2state:
+        old_cs = HQ_key2state[new_cs.state_key()]
+        if old_cs.get_score() > new_cs.get_score():
+            # print '******************* replacing state *****************'
+            remove_from_heap(old_cs)
+            # print 'replacing with', str(new_cs.state_key()), new_cs.get_score()
+            heappush(HQ, (new_cs.get_score(), new_cs))
+            HQ_key2state[new_cs.state_key()] = new_cs
+        else:
+            # print '******************* ignoreing state *****************'
+            pass
+    else:
+        # print '******************* adding state *****************'
+        heappush(HQ, (new_cs.get_score(), new_cs))
+        HQ_key2state[new_cs.state_key()] = new_cs
+        if len(HQ) > HQ_beam_width:
+            largest = nlargest(1, HQ)
+            (score, state) = largest[0]
+            remove_from_heap(state)
+
+
+"""
 def add_to_q(new_cs):
     global Q_key2state
     new_key = new_cs.state_key()
     if new_key in Q_key2state:
 
         old_cs = Q_key2state[new_key]  # old state obj with same coverage
-        if new_cs.get_score() < old_cs.get_score():  # TODO: what should really be the score?
+        if new_cs.get_score() < old_cs.get_score():
             Q_key2state[new_key] = new_cs
             Q_score2key.remove((old_cs.get_score(), new_key))
             Q_score2key.append((new_cs.get_score(), new_key))
@@ -84,7 +129,8 @@ def add_to_q(new_cs):
         Q_key2state[new_cs.state_key()] = new_cs
         Q_score2key.append((new_cs.get_score(), new_cs.state_key()))
         # print '*************adding state*************', new_cs.state_key()
-        # print 'len of Q', len(Q_key2state)
+        print 'len of Q', len(Q_key2state)
+"""
 
 
 def find_alignments(start_state, phrase_table):
@@ -93,10 +139,11 @@ def find_alignments(start_state, phrase_table):
     Q_score2key = []
     # solutions = {}
     best_solution = None
-    add_to_q(start_state)
-    while len(Q_key2state) > 0:
-        cs = pop_from_q()
-
+    # add_to_q(start_state)
+    add_to_heap(start_state)
+    while len(HQ) > 0:
+        # cs = pop_from_q()
+        cs = pop_from_heap()
         if False not in cs.cov_target:
             # print 'completed result:', cs.state_key(), 'score:', cs.get_score()
             # solutions[cs.get_score()] = cs
@@ -144,7 +191,8 @@ def find_alignments(start_state, phrase_table):
                     # completed_states.append(new_cs)
                     # print 'added completed state'
                     # else:
-                    add_to_q(new_cs)
+                    # add_to_q(new_cs)
+                    add_to_heap(new_cs)
                     got_match = True
                 else:
                     pass
@@ -156,21 +204,27 @@ def find_alignments(start_state, phrase_table):
                 st_idx = s_idx
                 end_idx = s_idx + k if s_idx + k < len(new_cs.target) else len(new_cs.target)
                 target_span = (st_idx, end_idx)
-                source_span_match = (None, None)
-                new_cs.add_alignment(target_span, source_span_match, 0.0)
-                add_to_q(new_cs)
+                target_token = new_cs.target[s_idx:end_idx][0]
+                source_spans = list(fillin[target_token])
+                source_spans.sort(reverse=True)
+                score_d, source_span = source_spans[0]
+                source_span_match = (None, None, '_' + source_span + '_')
+                new_cs.add_alignment(target_span, source_span_match, 0.1)
+                # add_to_q(new_cs)
+                add_to_heap(new_cs)
     # scores = sorted(solutions)
     # best_score = scores[0]
     return best_solution  # solutions[best_score]
 
 
 if __name__ == "__main__":
-    data_set = 'moses-files-tok'  # 'coursera-large'
+    data_set = 'moses-files-tok'  # 'coursera-large'  #
     phrase_table_file = open('data/' + data_set + '/model/phrase-table', 'r').readlines()
     train_en = open('data/' + data_set + '/train.clean.tok.en', 'r').readlines()
     train_de = open('data/' + data_set + '/train.clean.tok.de', 'r').readlines()
-    en2de = defaultdict(set)
+    # en2de = defaultdict(set)
     de2en = defaultdict(set)
+    fillin = defaultdict(set)
     for pt in phrase_table_file:
         parts = pt.split('|||')
         if len(parts[0].split()) < 6 and len(parts[1].split()) < 6:
@@ -178,8 +232,8 @@ if __name__ == "__main__":
             de = parts[1].strip()
             scores = [float(sc) for sc in parts[2].split()]
             # score = scores[0] * scores[1] + scores[2] * scores[3]
-            score = scores[0] * 0.5 + scores[2] * 0.5
-            en2de[en].add((score, de))
+            score = scores[0]  # * 0.5 + scores[2] * 0.5
+            # en2de[en].add((score, de))
             de2en[de].add((score, en))
 
     lex_file = open('data/' + data_set + '/model/lex.e2f', 'r').readlines()
@@ -190,7 +244,7 @@ if __name__ == "__main__":
         de = parts[1].strip()
         score = float(parts[2])
         lex_dict[en, de] = score
-
+    """
     lex_file_inv = open('data/' + data_set + '/model/lex.f2e', 'r').readlines()
     lex_dict_inv = {}
     for l in lex_file_inv:
@@ -199,28 +253,28 @@ if __name__ == "__main__":
         en = parts[1].strip()
         score = float(parts[2])
         lex_dict_inv[en, de] = score
-
+    """
     for e, d in lex_dict:
         score_e2f = lex_dict[e, d]
-        score_f2e = lex_dict_inv[e, d]
-        score = score_e2f * 0.5 + score_f2e * 0.5
-        en2de[e].add((score, d))
+        # score_f2e = lex_dict_inv[qe, d]
+        score = score_e2f  # * 0.5 + score_f2e * 0.5
+        # en2de[e].add((score, d))
         de2en[d].add((score, e))
-
+        fillin[d].add((score, e))
+    pdb.set_trace()
     print 'read data completed...'
-
-    for idx in range(20)[:]:
+    for idx in range(20)[:1]:
 
         # recursive solution
-        source_l = train_en[idx].split()
-        target_l = train_de[idx].split()
-        # target_l = "señora presidenta , una cuestión de procedimiento .".split()
-        # source_l = "madam president , on a point of order .".split()
+        source_l = train_en[idx].split()  # English
+        target_l = train_de[idx].split()  # German
+        # target_l = "kolossalen Anstieg des".split()
+        #source_l = " huge increase in ".split()
         # = ['minute']
         # = ['un', 'minuto']  # .split()
 
         phrase_table = de2en
-        if len(target_l) < 20 and len(source_l) < 20:
+        if len(target_l) < 25 and len(source_l) < 25:
             print '****************', 'SOLUTION FOR', idx, '****************'
             start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
 
@@ -230,7 +284,7 @@ if __name__ == "__main__":
                 current_solution = Q_recursion.pop()
                 # print(current_solution)
                 best_solution = find_alignments(current_solution, phrase_table)
-                # print 'best: ', best_solution.get_score()
+                print 'best: ', best_solution.get_score()
                 alignment_strings = best_solution.get_alignment_strings()
                 to_add = []
                 for a in sorted(alignment_strings):

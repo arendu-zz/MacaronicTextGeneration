@@ -1,4 +1,5 @@
 __author__ = 'arenduchintala'
+import pdb
 
 
 class SegmentState:
@@ -135,13 +136,16 @@ class SegmentState:
     def add_to_children(self, segmentstate):
         # At this point we convert relative spans positions back to original span positions
         # by adding the span start point of the parent (self is the parent)
-        if segmentstate.target_span == (None, None):
+        if segmentstate.target_span[0] == None and segmentstate.target_span[1] == None:
             pass
         else:
             segmentstate.target_span = (segmentstate.target_span[0] + self.target_span[0],
                                         segmentstate.target_span[1] + self.target_span[0])
-        if segmentstate.source_span == (None, None):
-            pass
+        if segmentstate.source_span[0] == None and segmentstate.source_span[1] == None:
+            if len(segmentstate.source_span) == 3 and len(segmentstate.source) == 1:
+                segmentstate.source[0] = segmentstate.source_span[2]
+            else:
+                pdb.set_trace()
         else:
             segmentstate.source_span = (segmentstate.source_span[0] + self.source_span[0],
                                         segmentstate.source_span[1] + self.source_span[0])
