@@ -3,17 +3,20 @@ __author__ = 'arenduchintala'
 from collections import defaultdict
 import SegmentState
 import PrintCuts
+import pdb, sys
+from optparse import OptionParser
 from heapq import heappush, heapify, heappop, nlargest
 # TODO read pre-ordering rules in collens and koen
 # TODO: parse sentences synchronously - get parser from joshua
 
-global Q_key2state, HQ_beam_width, Q_score2key, Q_recursion, HQ, HQ_key2state, fillin
+global Q_key2state, HQ_beam_width, Q_score2key, Q_recursion, HQ, HQ_key2state, fillin, hyp
 HQ_beam_width = 100
 HQ = []
 HQ_key2state = {}
 Q_key2state = {}
 Q_score2key = []
 Q_recursion = []
+hyp = "m1"
 
 
 def sub_array_match(d_span, d_list, d_cov):
@@ -54,15 +57,6 @@ def find_match_in_source(target_span, cs, phrase_table):
     return [False] * len(cs.source), [False] * len(cs.target), None, 0.0
 
 
-"""
-def pop_from_q():
-    Q_score2key.sort()
-    (score, cs_key) = Q_score2key.pop(0)
-    cs = Q_key2state.pop(cs_key)
-    return cs
-"""
-
-
 def pop_from_heap():
     global HQ, HQ_key2state
     (score, state) = heappop(HQ)
@@ -101,44 +95,13 @@ def add_to_heap(new_cs):
             remove_from_heap(state)
 
 
-"""
-def add_to_q(new_cs):
-    global Q_key2state
-    new_key = new_cs.state_key()
-    if new_key in Q_key2state:
-
-        old_cs = Q_key2state[new_key]  # old state obj with same coverage
-        if new_cs.get_score() < old_cs.get_score():
-            Q_key2state[new_key] = new_cs
-            Q_score2key.remove((old_cs.get_score(), new_key))
-            Q_score2key.append((new_cs.get_score(), new_key))
-            # print '*************replaced old state*************', new_cs.state_key()
-            # print 'len of Q', len(Q_key2state)
-        else:
-            # print '*************ignored new state*************', new_cs.state_key()
-            # print 'new score:', new_cs.get_score(), 'old score', old_cs.get_score()
-            # print 'new:'
-            # new_cs.display_alignment()
-            # print 'old'
-            # old_cs.display_alignment()
-            # print 'len of Q', len(Q_key2state)
-            # there is a same state with lower score
-            pass
-    else:
-        Q_key2state[new_cs.state_key()] = new_cs
-        Q_score2key.append((new_cs.get_score(), new_cs.state_key()))
-        # print '*************adding state*************', new_cs.state_key()
-        print 'len of Q', len(Q_key2state)
-"""
-
-
 def find_alignments(start_state, phrase_table):
     global Q_key2state, Q_score2key
     Q_key2state = {}
     Q_score2key = []
     # solutions = {}
     best_solution = None
-    # add_to_q(start_state)
+
     add_to_heap(start_state)
     while len(HQ) > 0:
         # cs = pop_from_q()
@@ -151,6 +114,8 @@ def find_alignments(start_state, phrase_table):
                 # cs.display_alignment_strings()
                 best_solution = cs
             elif cs.get_score() < best_solution.get_score():
+                sys.stdout.write("Best Score: %f   \r" % (cs.get_score()))
+                sys.stdout.flush()
                 # print 'found new best solution:'
                 # cs.display_alignment_strings()
                 best_solution = cs
@@ -158,9 +123,6 @@ def find_alignments(start_state, phrase_table):
                 # print 'ignoring solution:'
                 # cs.display_alignment_strings()
                 # pdb.set_trace()
-                # print 'found alignment with score:', cs.get_score()
-                # cs.display_alignment()
-                # print 'ok'
                 pass
         else:
             MAX_K = 6 if len(start_state.target) > 6 else len(start_state.target) - 1
@@ -171,7 +133,6 @@ def find_alignments(start_state, phrase_table):
                 st_idx = s_idx
                 end_idx = s_idx + k if s_idx + k < len(cs.target) else len(cs.target)
                 span_target = (st_idx, end_idx)
-                # print 'k', k, span_target
                 update_cov_source, update_cov_target, source_span_match, match_score = find_match_in_source(span_target,
                                                                                                             cs,
                                                                                                             phrase_table)
@@ -179,18 +140,12 @@ def find_alignments(start_state, phrase_table):
                     new_cs = cs.get_copy()  # SegmentState.SegmentState(e_list, d_list, cs.get_score() + 1)
                     new_cs.cov_source = [i | j for i, j in zip(cs.cov_source, update_cov_source)]
                     new_cs.cov_target = [i | j for i, j in zip(cs.cov_target, update_cov_target)]
+                    new_cs.cov_ratio = 1.0
                     st_idx = s_idx
                     end_idx = s_idx + k if s_idx + k < len(new_cs.target) else len(new_cs.target)
                     target_span = (st_idx, end_idx)
-                    # here we calculate score by how many words in source are covered
-                    # new_cs.add_alignment(target_span, source_span_match, source_span_match[1] - source_span_match[0])
-                    # here we actually use the match_score provided by the find_match_in_source method
                     new_cs.add_alignment(target_span, source_span_match, match_score)
-                    # if False not in new_cs.cov_source and False not in new_cs.cov_target:
-                    # completed_states.append(new_cs)
-                    # print 'added completed state'
-                    # else:
-                    # add_to_q(new_cs)
+
                     add_to_heap(new_cs)
                     got_match = True
                 else:
@@ -200,6 +155,15 @@ def find_alignments(start_state, phrase_table):
                 new_cs = cs.get_copy()
                 update_cov_target = [s_idx <= i < s_idx + 1 for i in range(len(cs.cov_target))]
                 new_cs.cov_target = [i | j for i, j in zip(cs.cov_target, update_cov_target)]
+
+                if hyp == "m1":
+                    new_cs.cov_ratio = 1.0
+                elif hyp == "m2":
+                    new_cs.cov_ratio = float(new_cs.cov_source.count(True) + len(new_cs.cov_source)) / float(
+                        2 * len(new_cs.cov_source))
+                else:
+                    new_cs.cov_ratio = float(new_cs.cov_source.count(True) + 1.0) / float(1.0 + len(new_cs.cov_source))
+
                 st_idx = s_idx
                 end_idx = s_idx + k if s_idx + k < len(new_cs.target) else len(new_cs.target)
                 target_span = (st_idx, end_idx)
@@ -217,10 +181,21 @@ def find_alignments(start_state, phrase_table):
 
 
 if __name__ == "__main__":
-    data_set = 'moses-files-tok'  # 'coursera-large'  #
-    phrase_table_file = open('data/' + data_set + '/model/phrase-table', 'r').readlines()
-    train_en = open('data/' + data_set + '/train.clean.tok.en', 'r').readlines()
-    train_de = open('data/' + data_set + '/train.clean.tok.de', 'r').readlines()
+    opt = OptionParser()
+
+    opt.add_option("-d", dest="data_set", default="data/moses-files/")
+    opt.add_option("--pt", dest="phrase_table", default="model/phrase-table")
+    opt.add_option("--en", dest="train_en", default="train.clean.tok.true.en")
+    opt.add_option("--de", dest="train_de", default="train.clean.tok.true.de")
+    opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
+    opt.add_option("--hp", dest="hyp", default="m1", help="hyperparameter 'm1' 'm2' or 'm3'")
+
+    (options, _) = opt.parse_args()
+    hyp = options.hyp
+    data_set = options.data_set
+    phrase_table_file = open(data_set + options.phrase_table, 'r').readlines()
+    train_en = open(data_set + options.train_en, 'r').readlines()
+    train_de = open(data_set + options.train_de, 'r').readlines()
     # en2de = defaultdict(set)
     de2en = defaultdict(set)
     fillin = defaultdict(set)
@@ -235,7 +210,7 @@ if __name__ == "__main__":
             # en2de[en].add((score, de))
             de2en[de].add((score, en))
 
-    lex_file = open('data/' + data_set + '/model/lex.e2f', 'r').readlines()
+    lex_file = open(data_set + options.lex + '.e2f', 'r').readlines()
     lex_dict = {}
     for l in lex_file:
         parts = l.split()
@@ -244,7 +219,7 @@ if __name__ == "__main__":
         score = float(parts[2])
         lex_dict[en, de] = score
     """
-    lex_file_inv = open('data/' + data_set + '/model/lex.f2e', 'r').readlines()
+    lex_file_inv = open(data_set + options.lex + '.f2e', 'r').readlines()
     lex_dict_inv = {}
     for l in lex_file_inv:
         parts = l.split()
@@ -255,56 +230,59 @@ if __name__ == "__main__":
     """
     for e, d in lex_dict:
         score_e2f = lex_dict[e, d]
-        # score_f2e = lex_dict_inv[qe, d]
+        # score_f2e = lex_dict_inv[e, d]
         score = score_e2f  # * 0.5 + score_f2e * 0.5
         # en2de[e].add((score, d))
         de2en[d].add((score, e))
         fillin[d].add((score, e))
-
+    snippet = "#" + str(opt.values) + "\n"
+    print snippet
     print 'read data completed...'
     for idx in range(20)[:]:
 
         # recursive solution
         source_l = train_en[idx].split()  # English
         target_l = train_de[idx].split()  # German
-        # target_l = "kolossalen Anstieg des".split()
-        # source_l = " huge increase in ".split()
+        # target_l = "Prozent angestiegen".split()
+        # source_l = "% over".split()
+        # target_l = ['allerdings', 'ist']
+        # source_l = [',', 'is']
         # = ['minute']
         # = ['un', 'minuto']  # .split()
 
         phrase_table = de2en
-        if len(target_l) < 25 and len(source_l) < 25:
+        if len(target_l) < 23 and len(source_l) < 23:
             print '****************', 'SOLUTION FOR', idx, '****************'
-            start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
+        start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
 
-            Q_recursion.append(start_state)
-            # print 'pushed', start_state.target, start_state.source
-            while len(Q_recursion) > 0:
-                current_solution = Q_recursion.pop()
-                # print(current_solution)
-                best_solution = find_alignments(current_solution, phrase_table)
-                print 'best: ', best_solution.get_score()
-                alignment_strings = best_solution.get_alignment_strings()
-                to_add = []
-                for a in sorted(alignment_strings):
-                    new_recursion_state = SegmentState.SegmentState(a[0], a[1],
-                                                                    alignment_strings[a][0],
-                                                                    alignment_strings[a][1])
-                    # print new_recursion_state
-                    current_solution.add_to_children(new_recursion_state)
-                    if len(alignment_strings[a][0]) > 1:
-                        to_add.append(new_recursion_state)
-                    else:
-                        pass  # don't recurse on single word phrases
-                        # print 'pushed', new_recursion_state.target, new_recursion_state.source
-                for ta in reversed(to_add):
-                    Q_recursion.append(ta)
-            print'\n********TREE LEVELS********'
-            PrintCuts.print_levels(start_state)
-
-            # print '\n********TREE CUTS********'
-            # start_state.display = True
-            # PrintCuts.print_cuts(start_state)
+        Q_recursion.append(start_state)
+        # print 'pushed', start_state.target, start_state.source
+        while len(Q_recursion) > 0:
+            current_solution = Q_recursion.pop()
+            # print(current_solution)
+            best_solution = find_alignments(current_solution, phrase_table)
+            # print 'best: ', best_solution.get_score()
+            # pdb.set_trace()
+            alignment_strings = best_solution.get_alignment_strings()
+            to_add = []
+            for a in sorted(alignment_strings):
+                new_recursion_state = SegmentState.SegmentState(a[0], a[1],
+                                                                alignment_strings[a][0],
+                                                                alignment_strings[a][1])
+                # print new_recursion_state
+                current_solution.add_to_children(new_recursion_state)
+                if len(alignment_strings[a][0]) > 1:
+                    to_add.append(new_recursion_state)
+                else:
+                    pass  # don't recurse on single word phrases
+                    # print 'pushed', new_recursion_state.target, new_recursion_state.source
+            for ta in reversed(to_add):
+                Q_recursion.append(ta)
+        print'\n********TREE LEVELS********'
+        PrintCuts.print_levels(start_state)
+        # print '\n********TREE CUTS********'
+        # start_state.display = True
+        # PrintCuts.print_cuts(start_state)
 
 
 

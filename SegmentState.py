@@ -1,14 +1,19 @@
 __author__ = 'arenduchintala'
 
+import pdb
 
-class SegmentState:
+
+class SegmentState(object):
     def __init__(self, target_span, source_span, target, source):
         self.target_span = target_span
         self.source_span = source_span
         self.target = target
         self.source = source
-        self.cov_target = [False] * len(target)
-        self.cov_source = [False] * len(source)
+        self._cov_target = [False] * len(target)
+        self._cov_source = [False] * len(source)
+        self.cov_ratio = 0.0
+        self.state_source = '0' * len(source)
+        self.state_target = '0' * len(target)
         self.alignments = []
         self._child_states = []
         self.display = False
@@ -20,11 +25,23 @@ class SegmentState:
         return str(self.target_span) + ' ' + ' '.join(self.target) + ' -> ' + str(
             self.source_span) + ' ' + ' '.join(self.source)
 
-    # def update_cov_target(self, uct):
-    # self.cov_target = [i | j for i, j in zip(uct, self.cov_target)]
+    @property
+    def cov_source(self):
+        return self._cov_source;
 
-    # def update_cov_source(self, ucs):
-    # self.cov_source = [i | j for i, j in zip(ucs, self.cov_source)]
+    @cov_source.setter
+    def cov_source(self, val):
+        self.state_source = ''.join(str(int(t)) for t in val)
+        self._cov_source = val
+
+    @property
+    def cov_target(self):
+        return self._cov_target;
+
+    @cov_target.setter
+    def cov_target(self, val):
+        self.state_target = ''.join(str(int(t)) for t in val)
+        self._cov_target = val
 
     def compare_state(self, segment_state):
         for i, t in enumerate(self.cov_target):
@@ -49,12 +66,14 @@ class SegmentState:
 
 
     def get_score(self):
-        return self.probability_score()
+        # return self.probability_score()
+        return self.coverage_ratio_score()
+
+    def coverage_ratio_score(self):
+        return self.probability_score() * self.cov_ratio
 
     def state_key(self):
-        bt = ''.join(str(int(t)) for t in self.cov_target)
-        bs = ''.join(str(int(s)) for s in self.cov_source)
-        return bt + ',' + bs
+        return self.state_target + ',' + self.state_source
 
     def add_alignment(self, target_span, source_span, alignment_score):
         self.alignments.append((target_span, source_span, alignment_score))

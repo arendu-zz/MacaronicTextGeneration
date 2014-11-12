@@ -3,7 +3,6 @@ __author__ = 'arenduchintala'
 This script accepts a SegmentState object that is created by bisegmentation search.
 The SegmentState has recursivly bisegmented a bitext
 """
-import SegmentState
 
 
 def get_state(root_node):
@@ -45,9 +44,10 @@ def display_ticks(root_node):
     return display_items
 
 
-global tree_stack, tree_stack_states
+global tree_stack, tree_stack_states, json
 tree_stack = {}
 tree_stack_states = []
+json = []
 
 
 def push_tree_stack(root_node):
@@ -82,6 +82,30 @@ def print_levels(segmentstate):
             print ' | '.join(list(t))
             print ' | '.join(list(f)), '\n'
         lvl += 1
+
+
+def get_json(segmentstate):
+    json = []
+    push_tree_stack(segmentstate)
+    while len(tree_stack) > 0:
+        current_root = pop_tree_stack()
+        current_display_nodes = display_ticks(current_root)
+        current_display_nodes.sort(key=lambda x: x.target_span[0])
+        disp = [str(i) for i in current_display_nodes]
+        # print ' '.join(disp)
+        tar = [' '.join(i.target) for i in current_display_nodes]
+        src = [' '.join(i.source) for i in current_display_nodes]
+
+        for i in xrange(len(tar)):
+            print (tar[i], src[i])
+
+            children.append((tar[i], src[i]))
+
+        for cdn in current_display_nodes:
+            root_cpy = current_root.deepcopy()
+            push_ticks(root_cpy, cdn)
+            push_tree_stack(root_cpy)
+    return json
 
 
 def print_cuts(segmentstate):
