@@ -184,10 +184,10 @@ def find_alignments(start_state, phrase_table):
 if __name__ == "__main__":
     opt = OptionParser()
 
-    opt.add_option("-d", dest="data_set", default="data/coursera-large/")
+    opt.add_option("-d", dest="data_set", default="data/moses-files/")
     opt.add_option("--pt", dest="phrase_table", default="model/phrase-table")
-    opt.add_option("--en", dest="train_en", default="train.clean.tok.en")
-    opt.add_option("--de", dest="train_de", default="train.clean.tok.es")
+    opt.add_option("--en", dest="train_en", default="train.clean.tok.true.en")
+    opt.add_option("--de", dest="train_de", default="train.clean.tok.true.de")
     opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
     opt.add_option("--hp", dest="hyp", default="m1", help="hyperparameter 'm1' 'm2' or 'm3'")
 
