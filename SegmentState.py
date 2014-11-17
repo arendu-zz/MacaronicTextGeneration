@@ -128,7 +128,6 @@ class SegmentState(object):
             t = self.target[0]
             t = t.strip()
             m = max(len(t), len(s))
-
             return [(t.center(m), s.center(m))]
         else:
             self.get_children().sort(key=lambda x: x.target_span[0])
@@ -174,3 +173,14 @@ class SegmentState(object):
         for c in self._child_states:
             cpy._child_states.append(c.deepcopy())
         return cpy
+
+
+    def get_recursive_rep(self):
+        if not self.get_children():
+            return ' '.join(self.source), ' '.join(self.target)
+        else:
+            c = []
+            for child in self.get_children():
+                c.append(child.get_recursive_rep())
+            return [(' '.join(self.source), ' '.join(self.target)), c]
+

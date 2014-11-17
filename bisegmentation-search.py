@@ -4,6 +4,7 @@ from collections import defaultdict
 import SegmentState
 import PrintCuts
 import pdb, sys
+from pprint import pprint
 from optparse import OptionParser
 from heapq import heappush, heapify, heappop, nlargest
 # TODO read pre-ordering rules in collens and koen
@@ -183,10 +184,10 @@ def find_alignments(start_state, phrase_table):
 if __name__ == "__main__":
     opt = OptionParser()
 
-    opt.add_option("-d", dest="data_set", default="data/moses-files/")
+    opt.add_option("-d", dest="data_set", default="data/coursera-large/")
     opt.add_option("--pt", dest="phrase_table", default="model/phrase-table")
-    opt.add_option("--en", dest="train_en", default="train.clean.tok.true.en")
-    opt.add_option("--de", dest="train_de", default="train.clean.tok.true.de")
+    opt.add_option("--en", dest="train_en", default="train.clean.tok.en")
+    opt.add_option("--de", dest="train_de", default="train.clean.tok.es")
     opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
     opt.add_option("--hp", dest="hyp", default="m1", help="hyperparameter 'm1' 'm2' or 'm3'")
 
@@ -279,6 +280,9 @@ if __name__ == "__main__":
             for ta in reversed(to_add):
                 Q_recursion.append(ta)
         print'\n********TREE LEVELS********'
+
+        rep = start_state.get_recursive_rep()
+
         PrintCuts.print_levels(start_state)
         # print '\n********TREE CUTS********'
         # start_state.display = True
