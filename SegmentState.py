@@ -177,10 +177,10 @@ class SegmentState(object):
 
     def get_recursive_rep(self):
         if not self.get_children():
-            return ' '.join(self.source), ' '.join(self.target)
+            return ' '.join(self.target), ' '.join(self.source)
         else:
             c = []
             for child in self.get_children():
                 c.append(child.get_recursive_rep())
-            return [(' '.join(self.source), ' '.join(self.target)), c]
+            return [(' '.join(self.target), ' '.join(self.source)), c]
 
