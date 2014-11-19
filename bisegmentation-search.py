@@ -4,6 +4,7 @@ from collections import defaultdict
 import SegmentState
 import PrintCuts
 import pdb, sys
+
 try:
     import simplejson as json
 except ImportError:
@@ -202,9 +203,6 @@ if __name__ == "__main__":
     phrase_table_file = open(data_set + options.phrase_table, 'r').readlines()
     test_en = open(options.test_en, 'r').readlines()
     test_de = open(options.test_de, 'r').readlines()
-    print test_de[0]
-    print [(str(i), str(s)) for i, s in enumerate(test_de[0].split())]
-    print ' '.join(['("' + str(i) + ' ' + str(s) + '")' for i, s in enumerate(test_de[0].split())])
     # en2de = defaultdict(set)
     de2en = defaultdict(set)
     fillin = defaultdict(set)
@@ -260,42 +258,36 @@ if __name__ == "__main__":
         # = ['un', 'minuto']  # .split()
 
         phrase_table = de2en
-        if len(target_l) < 23 and len(source_l) < 23:
+        if len(target_l) < 25 and len(source_l) < 25:
             print '****************', 'SOLUTION FOR', idx, '****************'
-        start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
+            start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
 
-        Q_recursion.append(start_state)
-        # print 'pushed', start_state.target, start_state.source
-        while len(Q_recursion) > 0:
-            current_solution = Q_recursion.pop()
-            # print(current_solution)
-            best_solution = find_alignments(current_solution, phrase_table)
-            # print 'best: ', best_solution.get_score()
-            # pdb.set_trace()
-            alignment_strings = best_solution.get_alignment_strings()
-            to_add = []
-            for a in sorted(alignment_strings):
-                new_recursion_state = SegmentState.SegmentState(a[0], a[1],
-                                                                alignment_strings[a][0],
-                                                                alignment_strings[a][1])
-                # print new_recursion_state
-                current_solution.add_to_children(new_recursion_state)
-                if len(alignment_strings[a][0]) > 1:
-                    to_add.append(new_recursion_state)
-                else:
-                    pass  # don't recurse on single word phrases
-                    # print 'pushed', new_recursion_state.target, new_recursion_state.source
-            for ta in reversed(to_add):
-                Q_recursion.append(ta)
-        print'\n********TREE LEVELS********'
-
-        rep = start_state.get_recursive_rep()
-        print json.dumps(rep)
-        # PrintCuts.print_levels(start_state)
-        # print '\n********TREE CUTS********'
-        # start_state.display = True
-        # PrintCuts.print_cuts(start_state)
-
-
-
-
+            Q_recursion.append(start_state)
+            # print 'pushed', start_state.target, start_state.source
+            while len(Q_recursion) > 0:
+                current_solution = Q_recursion.pop()
+                # print(current_solution)
+                best_solution = find_alignments(current_solution, phrase_table)
+                # print 'best: ', best_solution.get_score()
+                # pdb.set_trace()
+                alignment_strings = best_solution.get_alignment_strings()
+                to_add = []
+                for a in sorted(alignment_strings):
+                    new_recursion_state = SegmentState.SegmentState(a[0], a[1],
+                                                                    alignment_strings[a][0],
+                                                                    alignment_strings[a][1])
+                    # print new_recursion_state
+                    current_solution.add_to_children(new_recursion_state)
+                    if len(alignment_strings[a][0]) > 1:
+                        to_add.append(new_recursion_state)
+                    else:
+                        pass  # don't recurse on single word phrases
+                        # print 'pushed', new_recursion_state.target, new_recursion_state.source
+                for ta in reversed(to_add):
+                    Q_recursion.append(ta)
+            print'\n********TREE LEVELS********'
+            PrintCuts.print_levels(start_state)
+            # j_rep = start_state.get_recursive_rep()
+            # print '\n********TREE CUTS********'
+            # start_state.display = True
+            # PrintCuts.print_cuts(start_state)
