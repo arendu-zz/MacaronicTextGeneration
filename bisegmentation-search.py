@@ -4,7 +4,10 @@ from collections import defaultdict
 import SegmentState
 import PrintCuts
 import pdb, sys
-import simplejson as json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 from pprint import pprint
 from optparse import OptionParser
 from heapq import heappush, heapify, heappop, nlargest
@@ -187,10 +190,10 @@ if __name__ == "__main__":
     opt = OptionParser()
 
     opt.add_option("-d", dest="data_set", default="data/moses-files/")
+    opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
     opt.add_option("--pt", dest="phrase_table", default="model/phrase-table")
     opt.add_option("--en", dest="test_en", default="data/moses-files/train.clean.tok.true.en")
     opt.add_option("--de", dest="test_de", default="data/moses-files/train.clean.tok.true.de")
-    opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
     opt.add_option("--hp", dest="hyp", default="m1", help="hyperparameter 'm1' 'm2' or 'm3'")
 
     (options, _) = opt.parse_args()
