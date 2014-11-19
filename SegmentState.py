@@ -1,3 +1,4 @@
+# -*- coding: latin1 -*-
 __author__ = 'arenduchintala'
 
 import pdb
@@ -182,5 +183,5 @@ class SegmentState(object):
             c = []
             for child in self.get_children():
                 c.append(child.get_recursive_rep())
-            return [(' '.join(self.target), ' '.join(self.source)), c]
+            return [(' '.join([str(t) for t in self.target]), ' '.join([str(s) for s in self.source])), c]
 

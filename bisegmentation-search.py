@@ -1,12 +1,14 @@
-# -*- coding: utf-8 -*-
+# -*- coding: latin1 -*-
 __author__ = 'arenduchintala'
 from collections import defaultdict
 import SegmentState
 import PrintCuts
 import pdb, sys
+import simplejson as json
 from pprint import pprint
 from optparse import OptionParser
 from heapq import heappush, heapify, heappop, nlargest
+import codecs
 # TODO read pre-ordering rules in collens and koen
 # TODO: parse sentences synchronously - get parser from joshua
 
@@ -197,6 +199,9 @@ if __name__ == "__main__":
     phrase_table_file = open(data_set + options.phrase_table, 'r').readlines()
     train_en = open(data_set + options.train_en, 'r').readlines()
     train_de = open(data_set + options.train_de, 'r').readlines()
+    print train_de[0]
+    print [(str(i), str(s)) for i, s in enumerate(train_de[0].split())]
+    print ' '.join(['("' + str(i) + ' ' + str(s) + '")' for i, s in enumerate(train_de[0].split())])
     # en2de = defaultdict(set)
     de2en = defaultdict(set)
     fillin = defaultdict(set)
@@ -239,7 +244,7 @@ if __name__ == "__main__":
     snippet = "#" + str(opt.values) + "\n"
     print snippet
     print 'read data completed...'
-    for idx in range(20)[:]:
+    for idx in range(45)[:]:
 
         # recursive solution
         source_l = train_en[idx].split()  # English
@@ -282,8 +287,8 @@ if __name__ == "__main__":
         print'\n********TREE LEVELS********'
 
         rep = start_state.get_recursive_rep()
-
-        PrintCuts.print_levels(start_state)
+        print json.dumps(rep)
+        # PrintCuts.print_levels(start_state)
         # print '\n********TREE CUTS********'
         # start_state.display = True
         # PrintCuts.print_cuts(start_state)
