@@ -176,12 +176,24 @@ def find_alignments(start_state, phrase_table):
                 target_span = (st_idx, end_idx)
                 target_token = new_cs.target[s_idx:end_idx][0]
                 source_spans = list(fillin[target_token])
-                source_spans.sort(reverse=True)
-                score_d, source_span = source_spans[0]
-                source_span_match = (None, None, '_' + source_span + '_')
-                new_cs.add_alignment(target_span, source_span_match, 0.1)
-                # add_to_q(new_cs)
-                add_to_heap(new_cs)
+                if len(source_spans) == 0:
+                    target_token = target_token[0] + target_token[1:].lower()
+                    source_spans = list(fillin[target_token])
+                if len(source_spans) == 0:
+                    target_token = target_token.lower()
+                    source_spans = list(fillin[target_token])
+                if len(source_spans) == 0:
+                    source_span_match = (None, None, '_' + 'NULL' + '_')
+                    new_cs.add_alignment(target_span, source_span_match, 0.1)
+                    # add_to_q(new_cs)
+                    add_to_heap(new_cs)
+                else:
+                    source_spans.sort(reverse=True)
+                    score_d, source_span = source_spans[0]
+                    source_span_match = (None, None, '_' + source_span + '_')
+                    new_cs.add_alignment(target_span, source_span_match, 0.1)
+                    # add_to_q(new_cs)
+                    add_to_heap(new_cs)
     # scores = sorted(solutions)
     # best_score = scores[0]
     return best_solution  # solutions[best_score]
