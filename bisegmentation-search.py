@@ -188,8 +188,8 @@ if __name__ == "__main__":
 
     opt.add_option("-d", dest="data_set", default="data/moses-files/")
     opt.add_option("--pt", dest="phrase_table", default="model/phrase-table")
-    opt.add_option("--en", dest="train_en", default="train.clean.tok.true.en")
-    opt.add_option("--de", dest="train_de", default="train.clean.tok.true.de")
+    opt.add_option("--en", dest="test_en", default="data/moses-files/train.clean.tok.true.en")
+    opt.add_option("--de", dest="test_de", default="data/moses-files/train.clean.tok.true.de")
     opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
     opt.add_option("--hp", dest="hyp", default="m1", help="hyperparameter 'm1' 'm2' or 'm3'")
 
@@ -197,11 +197,11 @@ if __name__ == "__main__":
     hyp = options.hyp
     data_set = options.data_set
     phrase_table_file = open(data_set + options.phrase_table, 'r').readlines()
-    train_en = open(data_set + options.train_en, 'r').readlines()
-    train_de = open(data_set + options.train_de, 'r').readlines()
-    print train_de[0]
-    print [(str(i), str(s)) for i, s in enumerate(train_de[0].split())]
-    print ' '.join(['("' + str(i) + ' ' + str(s) + '")' for i, s in enumerate(train_de[0].split())])
+    test_en = open(options.test_en, 'r').readlines()
+    test_de = open(options.test_de, 'r').readlines()
+    print test_de[0]
+    print [(str(i), str(s)) for i, s in enumerate(test_de[0].split())]
+    print ' '.join(['("' + str(i) + ' ' + str(s) + '")' for i, s in enumerate(test_de[0].split())])
     # en2de = defaultdict(set)
     de2en = defaultdict(set)
     fillin = defaultdict(set)
@@ -247,8 +247,8 @@ if __name__ == "__main__":
     for idx in range(45)[:]:
 
         # recursive solution
-        source_l = train_en[idx].split()  # English
-        target_l = train_de[idx].split()  # German
+        source_l = test_en[idx].split()  # English
+        target_l = test_de[idx].split()  # German
         # target_l = "Prozent angestiegen".split()
         # source_l = "% over".split()
         # target_l = ['allerdings', 'ist']
