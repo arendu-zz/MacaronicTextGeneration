@@ -1,7 +1,7 @@
 #!/bin/sh
 #do tokenizing
-CORPUS_FOLDER="data/moses-files"
-CORPUS_PREFIX="train"
+CORPUS_FOLDER="data/europarl-full"
+CORPUS_PREFIX="europarl-v7"
 ${MOSES_DIR}/scripts/tokenizer/tokenizer.perl -l en < ${PROJECT_DIR}/${CORPUS_FOLDER}/${CORPUS_PREFIX}.en > ${PROJECT_DIR}/${CORPUS_FOLDER}/${CORPUS_PREFIX}.tok.en
 ${MOSES_DIR}/scripts/tokenizer/tokenizer.perl -l de < ${PROJECT_DIR}/${CORPUS_FOLDER}/${CORPUS_PREFIX}.de > ${PROJECT_DIR}/${CORPUS_FOLDER}/${CORPUS_PREFIX}.tok.de
 
