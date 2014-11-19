@@ -1,0 +1,195 @@
+#{'phrase_table': 'model/phrase-table', 'test_en': 'data/moses-files/train.clean.tok.true.en', 'data_set': 'data/europarl-full/', 'test_de': 'data/moses-files/train.clean.tok.true.de', 'hyp': 'm1', 'lex': 'model/lex'}
+
+read data completed...
+**************** SOLUTION FOR 0 ****************
+Best Score: -0.614889   Best Score: -0.551700   
+********TREE LEVELS********
+San FRANCISCO – Es war noch nie leicht , ein rationales Gespräch über den Wert von Gold zu führen .
+   San FRANCISCO – It has never been easy to have a rational conversation about the value of gold .    
+
+San |  FRANCISCO  | – | Es | war noch | nie leicht | , ein rationales |  Gespräch über   | den Wert von | Gold | zu führen .
+San | _Francisco_ | – | It |   has    | never been |    a rational    | conversation about | the value of | gold |      .       
+
+San |  FRANCISCO  | – | Es | war |   noch  |  nie  | leicht |  ,  | ein | rationales |  Gespräch   | über | den | Wert von | Gold |  zu  | führen .
+San | _Francisco_ | – | It | has | _still_ | never | _easy_ | _,_ |  a  |  rational  | conversation | about | the | value of | gold | _to_ |     .     
+
+San |  FRANCISCO  | – | Es | war |   noch  |  nie  | leicht |  ,  | ein | rationales |  Gespräch   | über | den |  Wert | von | Gold |  zu  | führen | .
+San | _Francisco_ | – | It | has | _still_ | never | _easy_ | _,_ |  a  |  rational  | conversation | about | the | value |  of | gold | _to_ |  _lead_ | . 
+
+**************** SOLUTION FOR 3 ****************
+
+********TREE LEVELS********
+und es kam , wie es kommen musste .
+     wouldn ’ t you know it ?     
+
+ und  | es |  kam  |  ,  | wie  |  es  | kommen | musste |  . 
+_and_ | it | _was_ | _,_ | _as_ | _it_ | _come_ |  _to_  | _._ 
+
+**************** SOLUTION FOR 4 ****************
+
+********TREE LEVELS********
+seit der Veröffentlichung ihrer Artikel ist der Goldpreis noch weiter gestiegen .
+  since their articles appeared , the price of gold has moved up still further .   
+
+ seit | der | Veröffentlichung | ihrer |  Artikel  | ist  | der Goldpreis | noch weiter | gestiegen | .
+since | the |   _publication_   | their | _Article_ | _is_ | price of gold |   further   |    has    | . 
+
+ seit | der | Veröffentlichung | ihrer |  Artikel  | ist  | der | Goldpreis |   noch  |  weiter | gestiegen | .
+since | the |   _publication_   | their | _Article_ | _is_ |  of |   price   | _still_ | further |    has    | . 
+
+**************** SOLUTION FOR 5 ****************
+
+********TREE LEVELS********
+jüngst erreichte er sogar ein Rekordhoch von 1.300 Dollar .
+   gold prices even hit a record-high $ 1,300 recently .     
+
+jüngst  | erreichte |  er  | sogar | ein | Rekordhoch | von  | 1.300 |   Dollar  | .
+recently | _reached_ | _it_ |  even |  a  |  _record_  | _of_ | _300_ | _dollars_ | . 
+
+**************** SOLUTION FOR 6 ****************
+
+********TREE LEVELS********
+im letzten Dezember argumentierten die Goldbugs , dass der Preis zweifellos in Richtung 2.000 Dollar gehen würde .
+           last December , many gold bugs were arguing that the price was inevitably headed for $ 2,000 .           
+
+im letzten | Dezember | argumentierten | die | Goldbugs | , | dass |  der  | Preis | zweifellos | in Richtung | 2.000 |   Dollar  | gehen | würde .
+   last    | December |    arguing     | the |  _NULL_  | , | that | _the_ | price |  _doubt_   |     for     | _000_ | _dollars_ |  _go_ |    .     
+
+ im  | letzten | Dezember | argumentierten | die | Goldbugs | , | dass |  der  | Preis | zweifellos |  in  |   Richtung  | 2.000 |   Dollar  | gehen |  würde | .
+_in_ |   last  | December |    arguing     | the |  _NULL_  | , | that | _the_ | price |  _doubt_   | _in_ | _direction_ | _000_ | _dollars_ |  _go_ | _would_ | . 
+
+**************** SOLUTION FOR 7 ****************
+
+********TREE LEVELS********
+beflügelt aufgrund des anhaltenden Aufwärtstrends , meint man nun mancherorts , dass Gold sogar noch höher steigen könnte .
+      now , emboldened by continuing appreciation , some are suggesting that gold could be headed even higher than that .       
+
+beflügelt |  aufgrund |  des  | anhaltenden | Aufwärtstrends | , | meint | man | nun | mancherorts | , | dass | Gold | sogar noch | höher |  steigen   | könnte | .
+_inspired_ | _because_ | _the_ |  continuing |     _trend_     | , |  _is_ |  be | now |     some    | , | that | gold |    even    | higher | _increase_ |  could  | . 
+
+beflügelt |  aufgrund |  des  | anhaltenden | Aufwärtstrends | , | meint | man | nun | mancherorts | , | dass | Gold | sogar |   noch  | höher |  steigen   | könnte | .
+_inspired_ | _because_ | _the_ |  continuing |     _trend_     | , |  _is_ |  be | now |     some    | , | that | gold |  even | _still_ | higher | _increase_ |  could  | . 
+
+**************** SOLUTION FOR 9 ****************
+
+********TREE LEVELS********
+seit damals ist er auf über 10.000 Punkte gestiegen .
+  since then , the index has climbed above 10,000 .    
+
+seit damals | ist  |  er  | auf über | 10.000 |  Punkte  | gestiegen | .
+ since then | _is_ | _it_ |   above   |  _10_  | _points_ |    has    | . 
+
+ seit | damals | ist  |  er  | auf  | über | 10.000 |  Punkte  | gestiegen | .
+since |  then  | _is_ | _it_ | _to_ |  _on_ |  _10_  | _points_ |    has    | . 
+
+**************** SOLUTION FOR 10 ****************
+
+********TREE LEVELS********
+nun hat Gold die magische Grenze von 1.000 Dollar überschritten , warum sollte sich sein Wert daher nicht auch verzehnfachen ?
+                now that gold has crossed the magic $ 1,000 barrier , why can ’ t it increase ten-fold , too ?                
+
+nun | hat | Gold | die magische |  Grenze  | von  | 1.000 |   Dollar  | überschritten | , | warum | sollte sich | sein |   Wert  |    daher    | nicht auch | verzehnfachen | ?
+now | has | gold |  the magic   | _border_ | _of_ |  _1_  | _dollars_ |    crossed     | , |  why  |      ,      | _be_ | _value_ | _therefore_ |    too     |    increase   | ? 
+
+nun | hat | Gold | die | magische |  Grenze  | von  | 1.000 |   Dollar  | überschritten | , | warum |  sollte  |  sich  | sein |   Wert  |    daher    | nicht |  auch  | verzehnfachen | ?
+now | has | gold | the |  magic   | _border_ | _of_ |  _1_  | _dollars_ |    crossed     | , |  why  | _should_ | _NULL_ | _be_ | _value_ | _therefore_ | _not_ | _also_ |    increase   | ? 
+
+**************** SOLUTION FOR 11 ****************
+Best Score: -0.202355   
+********TREE LEVELS********
+   zugegeben : es bedarf keiner großen Fantasie , um sich einen noch höheren Goldpreis vorzustellen .  
+admittedly , getting to a much higher price for gold is not quite the leap of imagination that it seems . 
+
+zugegeben :  | es | bedarf | keiner | großen |   Fantasie  | , um sich | einen |   noch  | höheren | Goldpreis | vorzustellen | .
+admittedly , | it |   is   |  not   | _large_ | imagination |     to    |   a   | _still_ |  higher  |   price   |     _to_     | . 
+
+zugegeben  | : | es | bedarf | keiner | großen |   Fantasie  | , um |  sich  | einen |   noch  | höheren | Goldpreis | vorzustellen | .
+admittedly | , | it |   is   |  not   | _large_ | imagination |  to  | _NULL_ |   a   | _still_ |  higher  |   price   |     _to_     | . 
+
+zugegeben  | : | es | bedarf | keiner | großen |   Fantasie  |  ,  | um |  sich  | einen |   noch  | höheren | Goldpreis | vorzustellen | .
+admittedly | , | it |   is   |  not   | _large_ | imagination | _,_ | to | _NULL_ |   a   | _still_ |  higher  |   price   |     _to_     | . 
+
+**************** SOLUTION FOR 12 ****************
+Best Score: -0.414150   Best Score: -0.415332   
+********TREE LEVELS********
+denn inflationsbereinigt erreicht der Goldpreis von heute nicht annähernd das Allzeithoch von Januar 1980 .
+   after adjusting for inflation , today ’ s price is nowhere near the all-time high of January 1980 .     
+
+   denn   | inflationsbereinigt |  erreicht  |  der  | Goldpreis | von | heute | nicht annähernd | das | Allzeithoch | von  |  Januar | 1980 | .
+_because_ |      inflation      | _achieved_ | _the_ |   price   |  of | today |   nowhere near   | the |     high    | _of_ | January | 1980 | . 
+
+   denn   | inflationsbereinigt |  erreicht  |  der  | Goldpreis | von | heute | nicht |    annähernd   | das | Allzeithoch | von  |  Januar | 1980 | .
+_because_ |      inflation      | _achieved_ | _the_ |   price   |  of | today | _not_ | _approximately_ | the |     high    | _of_ | January | 1980 | . 
+
+**************** SOLUTION FOR 13 ****************
+
+********TREE LEVELS********
+damals lag Gold bei 850 Dollar , also in heutigem Geldwert um einiges über 2.000 Dollar .
+        back then , gold hit $ 850 , or well over $ 2,000 in today ’ s dollars .         
+
+damals |  lag  | Gold | bei  | 850 |  Dollar | , | also | in | heutigem | Geldwert |  um  | einiges | über | 2.000 |   Dollar  | .
+ then  | _was_ | gold | _in_ | 850 | dollars | , | _so_ | in |  today   | _value_  | _to_ |   _a_   |  _on_ | _000_ | _dollars_ | . 
+
+**************** SOLUTION FOR 14 ****************
+Best Score: -0.343977   
+********TREE LEVELS********
+allerdings gab es im Januar 1980 offensichtlich einen „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität .
+          but January 1980 was arguably a “ freak peak ” during a period of heightened geo-political instability .          
+
+allerdings | gab |  es  |  im  |  Januar | 1980 | offensichtlich | einen |  „  |  Freak   | Peak |  “  |  in  | einer |  Zeit  |  erhöhter  | geopolitischer | Instabilität | .
+   but     | was | _it_ | _in_ | January | 1980 |  _obviously_   |   a   | _‘_ | _freaks_ | peak | _’_ | _in_ |   a   | _time_ | _increased_ | _geopolitical_ |  instability  | . 
+
+**************** SOLUTION FOR 15 ****************
+Best Score: -0.212130   
+********TREE LEVELS********
+bei einem Wert von 1.300 Dollar ist der heutige Preis wohl doppelt so hoch wie die sehr langfristigen , inflationsbereinigten Durchschnitts-Goldpreise .
+                at $ 1,300 , today ’ s price is probably more than double very long-term , inflation-adjusted , average gold prices .                  
+
+bei  | einem |   Wert  | von  | 1.300 |   Dollar  | ist der heutige | Preis |  wohl  | doppelt so hoch wie |  die  | sehr | langfristigen | , | inflationsbereinigten | Durchschnitts-Goldpreise | .
+_in_ |  _a_  | _value_ | _of_ | _300_ | _dollars_ |    today ’    | price | _well_ |        double       | _the_ | very |   long-term   | , |         _NULL_        |          _NULL_          | . 
+
+bei  | einem |   Wert  | von  | 1.300 |   Dollar  | ist  |  der  | heutige | Preis |  wohl  | doppelt so hoch | wie  |  die  | sehr | langfristigen | , | inflationsbereinigten | Durchschnitts-Goldpreise | .
+_in_ |  _a_  | _value_ | _of_ | _300_ | _dollars_ | _is_ | _the_ |  today  | price | _well_ |      double     | _as_ | _the_ | very |   long-term   | , |         _NULL_        |          _NULL_          | . 
+
+bei  | einem |   Wert  | von  | 1.300 |   Dollar  | ist  |  der  | heutige | Preis |  wohl  | doppelt |  so  |  hoch  | wie  |  die  | sehr | langfristigen | , | inflationsbereinigten | Durchschnitts-Goldpreise | .
+_in_ |  _a_  | _value_ | _of_ | _300_ | _dollars_ | _is_ | _the_ |  today  | price | _well_ |  double | _so_ | _high_ | _as_ | _the_ | very |   long-term   | , |         _NULL_        |          _NULL_          | . 
+
+**************** SOLUTION FOR 16 ****************
+
+********TREE LEVELS********
+was also könnte einen weiteren kolossalen Anstieg des Goldpreises von diesem Wert aus begründen ?
+               so what could justify another huge increase in gold prices from here ?               
+
+was also | könnte | einen weiteren | kolossalen | Anstieg des | Goldpreises | von  | diesem |   Wert  | aus  | begründen | ?
+so what  |  could  |    another     |    huge    | increase in |     gold    | _of_ | _this_ | _value_ | from |  justify   | ? 
+
+was  | also | könnte | einen | weiteren | kolossalen | Anstieg |  des  | Goldpreises | von  | diesem |   Wert  | aus  | begründen | ?
+what |  so  |  could  |  _a_  | another  |    huge    |    in   | _the_ |     gold    | _of_ | _this_ | _value_ | from |  justify   | ? 
+
+**************** SOLUTION FOR 17 ****************
+Best Score: -0.491355   Best Score: -0.495134   
+********TREE LEVELS********
+eine Möglichkeit wäre natürlich der totale Zusammenbruch des US-Dollars .
+     one answer , of course , is a complete collapse of the US dollar .      
+
+eine |  Möglichkeit | wäre natürlich | der |  totale  | Zusammenbruch | des | US-Dollars | .
+ a   | _possibility_ |  , of course ,   | the | complete |    collapse   |  of | US dollar  | . 
+
+eine |  Möglichkeit |  wäre  | natürlich | der |  totale  | Zusammenbruch | des | US-Dollars | .
+ a   | _possibility_ | _would_ | of course  | the | complete |    collapse   |  of |     US     | . 
+
+eine |  Möglichkeit |  wäre  | natürlich | der |  totale  | Zusammenbruch | des | US-Dollars | .
+ a   | _possibility_ | _would_ |     of     | the | complete |    collapse   |  of |     US     | . 
+
+**************** SOLUTION FOR 19 ****************
+Best Score: -0.439028   
+********TREE LEVELS********
+und wer sich in dieser Hinsicht wirklich Sorgen macht , könnte in Gold tatsächlich die verlässlichste Absicherung finden .
+                  and if you are really worried about that , gold might indeed be the most reliable hedge .                   
+
+und | wer sich | in dieser Hinsicht | wirklich | Sorgen macht | , | könnte in | Gold | tatsächlich | die | verlässlichste | Absicherung | finden | .
+and |  if you  |     about that     |  really  |   worried    | , |   might    | gold |    indeed    | the |  most reliable  |  _security_ | _find_ | . 
+
+und |  wer  |  sich  |  in  | dieser | Hinsicht | wirklich |   Sorgen   | macht | , | könnte |  in  | Gold | tatsächlich | die | verlässlichste | Absicherung | finden | .
+and | _who_ | _NULL_ | _in_ | _this_ |   _,_    |  really  | _concerns_ |  _is_ | , |  might  | _in_ | gold |    indeed    | the |       most      |  _security_ | _find_ | . 
+
