@@ -257,7 +257,7 @@ if __name__ == "__main__":
     snippet = "#" + str(opt.values) + "\n"
     print snippet
     print 'read data completed...'
-    for idx in range(45)[:]:
+    for idx in range(20)[:]:
 
         # recursive solution
         source_l = test_en[idx].split()  # English
