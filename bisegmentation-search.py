@@ -179,9 +179,11 @@ def find_alignments(start_state, phrase_table):
                 if len(source_spans) == 0:
                     target_token = target_token[0] + target_token[1:].lower()
                     source_spans = list(fillin[target_token])
+                
                 if len(source_spans) == 0:
                     target_token = target_token.lower()
                     source_spans = list(fillin[target_token])
+                
                 if len(source_spans) == 0:
                     source_span_match = (None, None, '_' + 'NULL' + '_')
                     new_cs.add_alignment(target_span, source_span_match, 0.1)
@@ -257,7 +259,7 @@ if __name__ == "__main__":
     snippet = "#" + str(opt.values) + "\n"
     print snippet
     print 'read data completed...'
-    for idx in range(45)[:]:
+    for idx in range(20)[:]:
 
         # recursive solution
         source_l = test_en[idx].split()  # English
@@ -270,7 +272,7 @@ if __name__ == "__main__":
         # = ['un', 'minuto']  # .split()
 
         phrase_table = de2en
-        if len(target_l) < 25 and len(source_l) < 25:
+        if len(target_l) < 23 and len(source_l) < 23:
             print '****************', 'SOLUTION FOR', idx, '****************'
             start_state = SegmentState.SegmentState((0, len(target_l)), (0, len(source_l)), target_l, source_l)
 
