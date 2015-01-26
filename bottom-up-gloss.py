@@ -15,22 +15,44 @@ class ChartItem(object):
 
     def __init__(self, gx):
         self.gx = gx
-        self._translations = {}
+        self._literaltranslations = {}
+        self._substringtranslations = {}
+
+    @property
+    def substringtranslations(self):
+        return [(s, v) for v, s in self._substringtranslations.items()]
+
+    @substringtranslations.setter
+    def substringtranslations(self, val):
+        self._substringtranslations = {}
+        self.append_substringtranslations(val)
+
+    def append_substringtranslations(self, val):
+        """
+        :param val: a list of tuples of translations, tuples of the form (score,vocab)
+        :return:
+        """
+        for s, v in val:
+            if s > self._substringtranslations.get(v, float('-inf')):
+                self._substringtranslations[v] = s
 
 
     @property
-    def translations(self):
-        return [(s, v) for v, s in self._translations.items()]
+    def literaltranslations(self):
+        return [(s, v) for v, s in self._literaltranslations.items()]
 
-    @translations.setter
-    def translations(self, val):
-        self._translations = {}
-        self.append_translations(val)
+    @literaltranslations.setter
+    def literaltranslations(self, val):
+        self._literaltranslations = {}
+        self.append_literaltranslations(val)
 
-    def append_translations(self, val):
+    def append_literaltranslations(self, val):
+        """
+        :param val: a list of tuples of translations, tuples of the form (score,vocab)
+        """
         for s, v in val:
-            if s > self._translations.get(v, float('-inf')):
-                self._translations[v] = s
+            if s > self._literaltranslations.get(v, float('-inf')):
+                self._literaltranslations[v] = s
 
 
 def get_lm_score(fragment):
@@ -71,16 +93,7 @@ def get_translation(de_span):
     return None
 
 
-if __name__ == "__main__":
-
-    opt = OptionParser()
-    opt.add_option("-d", dest="data_set", default="data/coursera-large/")
-    opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
-    opt.add_option("--lm", dest="lm", default="en.arpa", help="english language model file")
-    (options, _) = opt.parse_args()
-    data_set = options.data_set
-    lex_file = open(data_set + options.lex + '.e2f', 'r').readlines()
-    lm_model = lm.LanguageModel(data_set + options.lm)
+def read_lex(lex_file):
     lex_dict = {}
     for l in lex_file:
         parts = l.split()
@@ -88,12 +101,45 @@ if __name__ == "__main__":
         fr = parts[1].strip()
         score = log(float(parts[2]))
         lex_dict[fr] = lex_dict.get(fr, []) + [(score, en)]
+    return lex_dict
 
-    # fr = "San FRANCISCO – Es war noch nie leicht , ein rationales Gespräch über den Wert von Gold zu führen .".split()
-    # en = "San FRANCISCO – It has never been easy to have a rational conversation about the value of gold .".split()
 
-    en = "resumption of the session".split()
-    fr = "reanudación del período de sesiones".split()
+def corpus_spans(nbest):
+    span_dict = {}
+    for line in open(nbest, 'r').readlines():
+        sid, translation = line.split('|||')[:2]
+        # print translation
+        parts = translation.strip().split('|')
+        # print parts
+        for part_id in xrange(0, len(parts) - 1, 2):
+            # print parts[part_id], '<--', parts[part_id + 1]
+            span = tuple(int(s) for s in [sid.strip()] + parts[part_id + 1].split('-'))
+            # print span
+            s = span_dict.get(span, set([]))
+            s.add(parts[part_id])
+            span_dict[span] = s
+    return span_dict
+
+
+if __name__ == "__main__":
+    opt = OptionParser()
+    opt.add_option("-d", dest="data_set", default="data/moses-files/")
+    opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
+    opt.add_option("--lm", dest="lm", default="train.clean.tok.true.en.arpa", help="english language model file")
+    opt.add_option("--nb", dest="nbest", default="en-n-best.txt")
+    (options, _) = opt.parse_args()
+    data_set = options.data_set
+    lex_file = open(data_set + options.lex + '.e2f', 'r').readlines()
+    lm_model = lm.LanguageModel(data_set + options.lm)
+
+    lex_dict = read_lex(lex_file)
+    span_dict = corpus_spans(options.nbest)
+
+    fr = "San FRANCISCO – Es war noch nie leicht , ein rationales Gespräch über den Wert von Gold zu führen .".split()
+    en = "San FRANCISCO – It has never been easy to have a rational conversation about the value of gold .".split()
+
+    # en = "resumption of the session".split()
+    # fr = "reanudación del período de sesiones".split()
     n = len(fr)
     chart = {}
     """
@@ -103,8 +149,28 @@ if __name__ == "__main__":
         gx = ' '.join(fr[i:i + 1])
         Exs = sorted(lex_dict[gx], reverse=True)
         ci = ChartItem(gx)
-        ci.translations = Exs[:5]
+        ci.literaltranslations = Exs[:5]
+
+        ss = [(0.0, v) for v in span_dict.get((0, i, i), [])]
+        print i, ss
+        ci.substringtranslations = ss
         chart[i, i + 1] = ci
+
+    """
+    initialize chart with substring translations
+    """
+    for span in xrange(2, n + 1):
+        print 'span', span
+        for s in xrange(0, n - span + 1):
+            e = s + span
+            ci = ChartItem(' '.join(fr[s:e]))
+            chart[s, e] = ci
+            ci.substringtranslations = [(0.0, v) for v in span_dict.get((0, i, i), [])]
+            for m in xrange(s + 1, e):
+                c1 = chart[s, m].substringtranslations
+                c2 = chart[m, e].substringtranslations
+                # pdb.set_trace()
+
     """
     do larger spans 2 to n
     """
@@ -118,10 +184,10 @@ if __name__ == "__main__":
                 print 's,m,e', s, m, e
                 # print ' '.join(fr[s:e]), '=', fr[s:m], '+', fr[m:e]
                 # print ' '.join(fr[s:e]), '=', chart[s, m], '+', chart[m, e]
-                ex_trans = get_combinations(chart[s, m].translations, chart[m, e].translations, 5)
+                ex_trans = get_combinations(chart[s, m].literaltranslations, chart[m, e].literaltranslations, 5)
                 ci.append_translations(ex_trans)
-                print len(ci.translations)
-    pdb.set_trace()
+                print len(ci.literaltranslations)
+
     print 'ok'
 
 
