@@ -9,6 +9,25 @@ from math import log, exp
 import kenlm as lm
 
 
+def read_substring_translations(substring_trans_file, substring_spans_file):
+    spans_by_line_num = {}
+    for idx, l in enumerate(open(substring_spans_file).readlines()):
+        spans_by_line_num[idx] = tuple([int(i) for i in l.split()])
+
+    trans_by_span = {}
+    for l in codecs.open(substring_trans_file, 'r', 'utf-8').readlines():
+        parts = l.split('|||')
+        line_num = int(parts[0])
+        trans = ' '.join(parts[1].split()[1:-1])
+        score = float(parts[-1])
+        span_num = spans_by_line_num[line_num]
+        # print span_num, trans, score
+        trans_for_line = trans_by_span.get(span_num, [])
+        trans_for_line.append((score, trans))
+        trans_by_span[span_num] = trans_for_line
+    return trans_by_span
+
+
 def corpus_spans(nbest):
     span_dict = {}
     for line in open(nbest, 'r').readlines():
@@ -38,7 +57,7 @@ def read_lex(lex_file):
 
 
 def get_similarity(t_x_string, g_ik):
-    # TODO: do this method
+    # TODO: do this method how ot get a log probability from edit distance?
     pass
 
 
@@ -57,22 +76,25 @@ def get_combinations(E_y, E_z, g_x):
     return sorted(ss, reverse=True)[:10]
 
 
-def get_translations(gr_sent, i, j, spans_dict, sent_number, lex_dict):
+def get_translations(gr_sent, i, j, substring_translations, sent_number, lex_dict):
     if i == j:
         # single word span
         s = ' '.join(gr_sent[i:j + 1])
         ss = sorted(lex_dict[s], reverse=True)[:10]
     else:
-        ss = [(0.0, v) for v in set(spans_dict.get((sent_number, i, j), []))]
-        # TODO: replace this part with the trick Phillip gave
-        # %#$#$% <wall /> bla bla bla <wall /> @#$T#$
+        # Old method ss = [(0.0, v) for v in set(spans_dict.get((sent_number, i, j), []))]
+        pdb.set_trace()
+        ss = sorted(substring_translations[sent_number, i, j], reverse=True)[:10]
     return ss
 
 
 if __name__ == '__main__':
     opt = OptionParser()
-    opt.add_option("--ce", dest="en_corpus", default="train.clean.tok.true.en", help="english corpus sentences")
-    opt.add_option("--cd", dest="de_corpus", default="train.clean.tok.true.de", help="german corpus sentences")
+    opt.add_option("--ce", dest="en_corpus", default="train.clean.tok.true.20.en", help="english corpus sentences")
+    opt.add_option("--cd", dest="de_corpus", default="train.clean.tok.true.20.de", help="german corpus sentences")
+    opt.add_option("--st", dest="substr_trans", default="substring_trans.20.de", help="german corpus sentences")
+    opt.add_option("--ss", dest="substr_spans", default="train.clean.tok.true.20.de.span",
+                   help="each line has a span and sent num")
     opt.add_option("-d", dest="data_set", default="data/moses-files/")
     opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
     opt.add_option("--lm", dest="lm", default="train.clean.tok.true.en.arpa", help="english language model file")
@@ -82,7 +104,8 @@ if __name__ == '__main__':
     lex_data = codecs.open(data_set + options.lex + '.e2f', 'r', 'utf-8').readlines()
     en_sentences = codecs.open(data_set + options.en_corpus, 'r', 'utf-8').readlines()
     de_sentences = codecs.open(data_set + options.de_corpus, 'r', 'utf-8').readlines()
-
+    substring_translations = read_substring_translations(data_set + options.substr_trans,
+                                                         data_set + options.substr_spans)
     lex_dict = read_lex(lex_data)
     spans_dict = corpus_spans(options.nbest)
     lm_model = lm.LanguageModel(data_set + options.lm)
@@ -96,7 +119,7 @@ if __name__ == '__main__':
     # initialize unary nodes
     n = len(de)
     for i in xrange(0, n):
-        E_x = get_translations(de, i, i, spans_dict, 5, lex_dict)
+        E_x = get_translations(de, i, i, substring_translations, 5, lex_dict)
         print de[i:i + 1], E_x
         unary_nodes[i, i] = E_x
 
@@ -113,7 +136,7 @@ if __name__ == '__main__':
                 E_x = get_combinations(E_y, E_z, de[i:k + 1])
                 binary_nodes[i, k] = E_x
 
-                T_x = get_translations(de, i, k, spans_dict, 5, lex_dict)
+                T_x = get_translations(de, i, k, substring_translations, 5, lex_dict)
                 for t_x in T_x:
                     t_x[0] += get_similarity(t_x[1], binary_nodes[i, k])
                 unary_nodes[i, k] = T_x
