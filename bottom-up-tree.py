@@ -8,10 +8,10 @@ import utils
 import pdb
 from math import log, exp
 import kenlm as lm
-from editdistance import edscore
+from editdistance import edscore, editdistance_prob
 
 global all_nonterminalsm, lex_dict, spans_dict, substring_translations, stopwords, lm_model
-hard_prune = 3
+hard_prune = 10
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
@@ -43,7 +43,7 @@ class NonTerminal(object):
             pass
 
     def __str__(self):
-        return ' '.join([str(self.idx), str(self.phrase), str(self.score)])
+        return ' '.join([str(self.idx), self.phrase.encode('utf-8'), str(self.score)])
 
     def __cmp__(self, other):
         if self.score < other.score:
@@ -106,8 +106,11 @@ def get_similarity(t_x, E_y):
     max_ed_score = float('-inf')
     max_e_yt = None
     for e_y in E_y:
-        # TODO: do this method how ot get a log probability from edit distance? (Currently a hack)
-        ed_score = edscore(t_x.phrase, e_y.phrase)
+        # TODO: do this method how to get a log probability from edit distance? (Currently a hack)
+        # ed_score = np.log(edscore(t_x.phrase, e_y.phrase))
+        ed_score = editdistance_prob(t_x.phrase, e_y.phrase)
+        #
+        # pdb.set_trace()
         if ed_score > max_ed_score:
             max_ed_score = ed_score
             max_e_yt = e_y
@@ -116,7 +119,7 @@ def get_similarity(t_x, E_y):
     # TODO: this should not just be a simple log addition
     # TODO: must learn weights for this
     try:
-        t_x.score += np.log(max_ed_score)
+        t_x.score += max_ed_score
     except ValueError:
         pdb.set_trace()
     t_x.add_nonTerminalChild(max_e_yt.idx)
@@ -124,18 +127,22 @@ def get_similarity(t_x, E_y):
 
 
 def insert_stopword(e1, e2):
+    """
+    :param e1: non terminal
+    :param e2: non terminal
+    :return: score,phrase
+    """
     global stopwords, lm_model
     l = []
     e = e1.phrase + ' ' + e2.phrase
-    en = float(len(e.split()))
-    no_sw = lm_model.score(e) / 1.0
+    e_score = e1.score + e2.score  # TODO: figure out how to properly combine these scores
+    no_sw = e_score + lm_model.score(e)  # TODO: how to combine lm_score with mt_scores
     l.append((no_sw, e))
     for sw in stopwords:
         e_ws = e1.phrase + ' ' + sw + ' ' + e2.phrase
-        en_ws = float(len(e_ws.split()))
-        sw = lm_model.score(e_ws) / 1.0
+        sw = e_score + lm_model.score(e_ws)  # TODO: how to combine lm_score with mt_scores
         l.append((sw, e_ws))
-    return sorted(l, reverse=True)[:10]
+    return sorted(l, reverse=True)[0]
 
 
 def get_combinations(E_y, E_z, g_x):
@@ -153,32 +160,29 @@ def get_combinations(E_y, E_z, g_x):
     nonterminals = []
     ss = {}
     for e1, e2 in it.chain(it.product(E_y, E_z), it.product(E_z, E_y)):
-        e_x_score = e1.score + e2.score  # TODO: learn weights for this addition
-        e_x_term = ' '.join([e1.phrase.strip(), e2.phrase.strip()])
-        e_ws = insert_stopword(e1, e2)
-        # pdb.set_trace()
+        e_score, e_phrase = insert_stopword(e1, e2)  # returns best (score,phrase) with stop word insertion LM cost
         i = min(e1.span[0], e2.span[0])
         k = max(e2.span[1], e2.span[1])
-        # TODO: score e_x also based on how good a translation of g_x is it
-        # how to do this?
-        current_score = ss.get(e_x_term, float('-inf'))
-        if e_x_score > current_score:
-            ss[e_x_term] = e_x_score
+        # TODO: score e_x also based on how good a translation of g_x is it,how to do this?
+        current_score = ss.get(e_phrase, float('-inf'))
+        if e_score > current_score:
+            ss[e_phrase] = e_score
             nt = NonTerminal(len(all_nonterminals), i, k)
-            nt.score = e_x_score
-            nt.phrase = e_x_term
+            nt.score = e_score
+            nt.phrase = e_phrase
             nt.add_nonTerminalChild(e1.idx)
             nt.add_nonTerminalChild(e2.idx)
             nonterminals.append(nt)
             all_nonterminals[nt.idx] = nt
 
-    return sorted(nonterminals, reverse=True)[:hard_prune]
+    return sorted(nonterminals, reverse=True)
 
 
-def get_single_word_translations(g_x, idx):
+def get_single_word_translations(g_x, sent_number, idx):
     global all_nonterminals, lex_dict, hard_prune
     nonterminals = []
-    ss = sorted(lex_dict[g_x], reverse=True)[:hard_prune]
+    # ss = sorted(lex_dict[g_x], reverse=True)[:hard_prune]
+    ss = sorted(substring_translations[sent_number, idx, idx], reverse=True)[:hard_prune]
     for score, phrase in ss:
         nt = NonTerminal(len(all_nonterminals), idx, idx)
         nt.score = score
@@ -202,33 +206,19 @@ def get_substring_translations(sent_number, i, k):
     return nonterminals
 
 
-"""
-def get_translations(gr_sent, i, j, substring_translations, sent_number, lex_dict):
-    global all_nonterminals
-    nonterminals = []
-    if i == j:
-        # single word span
-        s = ' '.join(gr_sent[i:j + 1])
-        ss = sorted(lex_dict[s], reverse=True)[:hard_prune]
-        for score, phrase in ss:
-            nt = NonTerminal(len(all_nonterminals))
-            nt.score = score
-            nt.phrase = phrase
-            nt.add_terminalChild(' '.join(gr_sent[i:j + 1]))
-            nonterminals.append(nt)
-
-    else:
-        # Old method ss = [(0.0, v) for v in set(spans_dict.get((sent_number, i, j), []))]
-        ss = sorted(substring_translations[sent_number, i, j], reverse=True)[:hard_prune]
-        for score, phrase in ss:
-            nt = NonTerminal(len(all_nonterminals))
-            nt.score = score
-            nt.phrase = phrase
-    return ss
-"""
+def display_best_nt(node, i, k):
+    """
+    :param node: a node is merely a list of non-terminals
+    :return:
+    """
+    print '***************************************************'
+    print 'node span', i, k, 'best nonterminal'
+    b_score, b_nt = sorted([(nt.score, nt) for nt in node], reverse=True)[0]
+    display_tree(b_nt, collapse_same_str=False, show_score=True)
+    print '***************************************************'
 
 
-def display_tree(root_unary):
+def display_tree(root_unary, collapse_same_str=True, show_score=False):
     global all_nonterminals
     print_dict = {}
     reached_leaf = []
@@ -246,7 +236,7 @@ def display_tree(root_unary):
         print_nodes.sort()
         all_print_nodes = print_nodes + reached_leaf
         all_print_nodes.sort()
-        print_line = ' | '.join([pn.phrase for ps, pn in all_print_nodes])
+        print_line = ' | '.join([pn.phrase.encode('utf-8') for ps, pn in all_print_nodes])
         print_line_num = print_dict.get(print_line, len(print_dict))
         print_dict[print_line] = print_line_num
         children_stack = next_children_stack
@@ -288,7 +278,8 @@ if __name__ == '__main__':
             # initialize unary nodes
             n = len(de)
             for i in xrange(0, n):
-                E_x = get_single_word_translations(' '.join(de[i:i + 1]), i)
+                E_x = get_single_word_translations(' '.join(de[i:i + 1]), sent_num, i)  # using lex table
+                # E_x = get_substring_translations(sent_num, i, i)  # using substring translations
                 unary_nodes[i, i] = E_x
 
             # for larger spans
@@ -301,26 +292,34 @@ if __name__ == '__main__':
                         E_y = unary_nodes[i, j]
                         E_z = unary_nodes[j + 1, k]
                         E_x = get_combinations(E_y, E_z, de[i:k + 1])
+                        bl = binary_nodes.get((i, k), [])
+                        E_x += bl
                         binary_nodes[i, k] = E_x
 
-                        T_x = get_substring_translations(sent_num, i, k)
-                        E_x = []
-                        for t_x in T_x:
-                            t_x = get_similarity(t_x, binary_nodes[i, k])
-                            E_x.append(t_x)
-                        unary_nodes[i, k] = E_x
+                    T_x = get_substring_translations(sent_num, i, k)
+                    E_x = []
+                    for t_x in T_x:
+                        t_x = get_similarity(t_x, sorted(binary_nodes[i, k], reverse=True)[:hard_prune])
+                        E_x.append(t_x)
+                    ul = unary_nodes.get((i, k), [])
+                    E_x += ul
+                    unary_nodes[i, k] = E_x
+
+                    # display_best_nt(unary_nodes[i, k], i, k)
+                    # pdb.set_trace()
 
             """
             if we have human translation, we find the root unary node that is closest to the human translation
             """
             closest_unary = None
             best_edscore_from_human = float('-inf')
-            for root_unary in unary_nodes[0, len(de) - 1]:
+            for idx, root_unary in enumerate(unary_nodes[0, len(de) - 1]):
                 eds = edscore(root_unary.phrase, en)
-                if eds > best_edscore_from_human:
-                    closest_unary = root_unary
-                    best_edscore_from_human = eds
+            if eds > best_edscore_from_human:
+                closest_unary = root_unary
+            best_edscore_from_human = eds
 
+            print 'closest unary'
             print en_sentences[sent_num].strip()
             display_tree(closest_unary)
             print ' | '.join(de)
