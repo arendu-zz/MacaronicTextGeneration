@@ -283,7 +283,6 @@ if __name__ == '__main__':
     lex_dict = read_lex(lex_data)
     spans_dict = corpus_spans(options.nbest)
     stopwords = codecs.open(data_set + options.stopwords, 'r').read().split()
-    pdb.set_trace()
     lm_model = lm.LanguageModel(data_set + options.lm)
     for sent_num in xrange(0, 10):
         en = en_sentences[sent_num].split()
