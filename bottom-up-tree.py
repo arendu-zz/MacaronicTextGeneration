@@ -331,8 +331,8 @@ if __name__ == '__main__':
 
             closest_unary = unary_nodes[0, n - 1][0]
             display_tree(closest_unary)
-            print ' | '.join(de)
-            print ''
+            print u' | '.join(de)
+            print u''
 
 
 
