@@ -10,8 +10,8 @@ from math import log, exp
 import kenlm as lm
 from editdistance import edscore, editdistance_prob
 
-global all_nonterminalsm, lex_dict, spans_dict, substring_translations, stopwords, lm_model
-hard_prune = 10
+global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords, lm_model
+hard_prune = 50
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
@@ -27,6 +27,9 @@ class NonTerminal(object):
         self.phrase = None
         self._children = []
         self.isChildTerminal = False
+
+    def display_tree(self):
+        pass
 
     def add_terminalChild(self, i, gx):
         self.isChildTerminal = True
@@ -55,6 +58,7 @@ class NonTerminal(object):
 
 
 def read_substring_translations(substring_trans_file, substring_spans_file):
+    take_only_tm_score = True  # TODO: figure out whether it is ok to use this scoring method
     spans_by_line_num = {}
     for idx, l in enumerate(open(substring_spans_file).readlines()):
         spans_by_line_num[idx] = tuple([int(i) for i in l.split()])
@@ -63,8 +67,13 @@ def read_substring_translations(substring_trans_file, substring_spans_file):
     for l in codecs.open(substring_trans_file, 'r', 'utf-8').readlines():
         parts = l.split('|||')
         line_num = int(parts[0])
+
         trans = ' '.join(parts[1].split()[1:-1])
-        score = float(parts[-1])
+        if take_only_tm_score:
+            score = sum([float(s) for s in parts[-2].split()[-4:]])
+        else:
+            score = float(parts[-1])
+
         span_num = spans_by_line_num[line_num]
         # print span_num, trans, score
         trans_for_line = trans_by_span.get(span_num, [])
@@ -106,11 +115,9 @@ def get_similarity(t_x, E_y):
     max_ed_score = float('-inf')
     max_e_yt = None
     for e_y in E_y:
-        # TODO: do this method how to get a log probability from edit distance? (Currently a hack)
+        # TODO: is editdistance_prob doing the right thing? insert/delete/substitute cost = 1/3
         # ed_score = np.log(edscore(t_x.phrase, e_y.phrase))
-        ed_score = editdistance_prob(t_x.phrase, e_y.phrase)
-        #
-        # pdb.set_trace()
+        ed_score = editdistance_prob(t_x.phrase, e_y.phrase) + e_y.score  # TODO:(+e_y.score) term not suppose to be?
         if ed_score > max_ed_score:
             max_ed_score = ed_score
             max_e_yt = e_y
@@ -122,6 +129,7 @@ def get_similarity(t_x, E_y):
         t_x.score += max_ed_score
     except ValueError:
         pdb.set_trace()
+
     t_x.add_nonTerminalChild(max_e_yt.idx)
     return t_x
 
@@ -191,6 +199,15 @@ def get_single_word_translations(g_x, sent_number, idx):
         nonterminals.append(nt)
         all_nonterminals[nt.idx] = nt
     return nonterminals
+
+
+def get_human_reference(ref):
+    global all_nonterminals
+    nt = NonTerminal(len(all_nonterminals), 0, n - 1)
+    nt.score = 0.0
+    nt.phrase = ref
+    all_nonterminals[nt.idx] = nt
+    return [nt]
 
 
 def get_substring_translations(sent_number, i, k):
@@ -266,6 +283,7 @@ if __name__ == '__main__':
     lex_dict = read_lex(lex_data)
     spans_dict = corpus_spans(options.nbest)
     stopwords = codecs.open(data_set + options.stopwords, 'r').read().split()
+    pdb.set_trace()
     lm_model = lm.LanguageModel(data_set + options.lm)
     for sent_num in xrange(0, 10):
         en = en_sentences[sent_num].split()
@@ -296,7 +314,11 @@ if __name__ == '__main__':
                         E_x += bl
                         binary_nodes[i, k] = E_x
 
-                    T_x = get_substring_translations(sent_num, i, k)
+                    if k == n - 1 and i == 0:
+                        # when the span is the entire de sentence the "translation" is the reference en sentence
+                        T_x = get_human_reference(' '.join(en))
+                    else:
+                        T_x = get_substring_translations(sent_num, i, k)
                     E_x = []
                     for t_x in T_x:
                         t_x = get_similarity(t_x, sorted(binary_nodes[i, k], reverse=True)[:hard_prune])
@@ -311,14 +333,17 @@ if __name__ == '__main__':
             """
             if we have human translation, we find the root unary node that is closest to the human translation
             """
+            """
             closest_unary = None
             best_edscore_from_human = float('-inf')
-            for idx, root_unary in enumerate(unary_nodes[0, len(de) - 1]):
+            for idx, root_unary in enumerate(unary_nodes[0, n - 1]):
                 eds = edscore(root_unary.phrase, en)
             if eds > best_edscore_from_human:
                 closest_unary = root_unary
             best_edscore_from_human = eds
-
+            """
+            closest_unary = unary_nodes[0, n - 1][0]
+            pdb.set_trace()
             print 'closest unary'
             print en_sentences[sent_num].strip()
             display_tree(closest_unary)
