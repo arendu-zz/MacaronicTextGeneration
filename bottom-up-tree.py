@@ -329,22 +329,7 @@ if __name__ == '__main__':
                     # display_best_nt(unary_nodes[i, k], i, k)
                     # pdb.set_trace()
 
-            """
-            if we have human translation, we find the root unary node that is closest to the human translation
-            """
-            """
-            closest_unary = None
-            best_edscore_from_human = float('-inf')
-            for idx, root_unary in enumerate(unary_nodes[0, n - 1]):
-                eds = edscore(root_unary.phrase, en)
-            if eds > best_edscore_from_human:
-                closest_unary = root_unary
-            best_edscore_from_human = eds
-            """
             closest_unary = unary_nodes[0, n - 1][0]
-            pdb.set_trace()
-            print 'closest unary'
-            print en_sentences[sent_num].strip()
             display_tree(closest_unary)
             print ' | '.join(de)
             print ''
