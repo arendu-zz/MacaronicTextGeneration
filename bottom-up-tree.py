@@ -11,7 +11,7 @@ import kenlm as lm
 from editdistance import edscore, editdistance_prob
 
 global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords, lm_model
-hard_prune = 50
+hard_prune = 1
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
@@ -25,15 +25,28 @@ class NonTerminal(object):
         self.span = (i, k)
         self.score = 0.0
         self.phrase = None
+        self.german_phrase = None
         self._children = []
+
         self.isChildTerminal = False
+        self.display_width = 0
 
-    def display_tree(self):
-        pass
+    def get_display_width(self):
+        global all_nonterminals
 
-    def add_terminalChild(self, i, gx):
-        self.isChildTerminal = True
-        self._children = [(i, i, gx)]
+        if self.isChildTerminal:
+            self.display_width = len(self.phrase) + 2
+        else:
+            dw = 0
+            for child in [all_nonterminals[idx] for idx in self._children]:
+                dw += child.get_display_width()
+            self.display_width = max(dw, len(self.phrase) + 2)
+        return self.display_width
+
+
+    def add_terminalChild(self, nt_child):
+        self._children = [nt_child.idx]
+
 
     def get_children(self):
         return self._children
@@ -131,6 +144,7 @@ def get_similarity(t_x, E_y):
         pdb.set_trace()
 
     t_x.add_nonTerminalChild(max_e_yt.idx)
+    t_x.display_width = max_e_yt.display_width
     return t_x
 
 
@@ -178,6 +192,7 @@ def get_combinations(E_y, E_z, g_x):
             nt = NonTerminal(len(all_nonterminals), i, k)
             nt.score = e_score
             nt.phrase = e_phrase
+            nt.display_width = e1.display_width + e2.display_width + 1
             nt.add_nonTerminalChild(e1.idx)
             nt.add_nonTerminalChild(e2.idx)
             nonterminals.append(nt)
@@ -191,13 +206,23 @@ def get_single_word_translations(g_x, sent_number, idx):
     nonterminals = []
     # ss = sorted(lex_dict[g_x], reverse=True)[:hard_prune]
     ss = sorted(substring_translations[sent_number, idx, idx], reverse=True)[:hard_prune]
+
     for score, phrase in ss:
+        """
+        lowest level english nonterminal
+        """
         nt = NonTerminal(len(all_nonterminals), idx, idx)
+        all_nonterminals[nt.idx] = nt
         nt.score = score
         nt.phrase = phrase
-        nt.add_terminalChild(idx, g_x)
+        nt.german_phrase = g_x
         nonterminals.append(nt)
-        all_nonterminals[nt.idx] = nt
+
+        nt.display_width = max(len(g_x.encode('utf-8')) + 2, len(phrase.encode('utf-8')) + 2)
+        # print g_x, phrase, len(g_x.encode('utf-8')) + 2, len(phrase.encode('utf-8')) + 2, nt.display_width, len(g_x.center(nt.display_width))
+        nt.isChildTerminal = True
+        # nt.add_terminalChild(nt_german)
+
     return nonterminals
 
 
@@ -250,13 +275,17 @@ def display_tree(root_unary, collapse_same_str=True, show_score=False):
                 print_nodes.append((cs, cn))
                 next_children_stack += [(all_nonterminals[ccn_idx].span, all_nonterminals[ccn_idx]) for ccn_idx in
                                         cn.get_children()]
+
         print_nodes.sort()
         all_print_nodes = print_nodes + reached_leaf
         all_print_nodes.sort()
-        print_line = ' | '.join([pn.phrase.encode('utf-8') for ps, pn in all_print_nodes])
+        print_line = '|'.join([pn.phrase.encode('utf-8').center(pn.display_width) for ps, pn in all_print_nodes])
         print_line_num = print_dict.get(print_line, len(print_dict))
         print_dict[print_line] = print_line_num
         children_stack = next_children_stack
+    leaf_line = '|'.join([pn.german_phrase.encode('utf-8').center(pn.display_width) for ps, pn in sorted(reached_leaf)])
+
+    print_dict[leaf_line] = len(print_dict)
     for l, p in sorted([(l, p) for p, l in print_dict.items()]):
         print p
 
@@ -330,8 +359,9 @@ if __name__ == '__main__':
                     # pdb.set_trace()
 
             closest_unary = unary_nodes[0, n - 1][0]
+            print ''
             display_tree(closest_unary)
-            print u' | '.join(de)
+            # print u'|'.join(de)
             print u''
 
 

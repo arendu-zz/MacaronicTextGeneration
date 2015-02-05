@@ -13,7 +13,8 @@ if __name__ == '__main__':
     de_sentences = codecs.open(data_set + options.de_corpus, 'r', 'utf-8').readlines()
 
     span_file = codecs.open(data_set + options.de_corpus + '.span', 'w', 'utf-8')
-    txt_span_file = codecs.open(data_set + options.de_corpus + '.txtspan', 'w', 'utf-8')
+    txt_zone_file = codecs.open(data_set + options.de_corpus + '.txtspan', 'w', 'utf-8')
+
     for idx, de_sent in enumerate(de_sentences[:20]):
         de_sent = de_sent.split()
         n = len(de_sent)
@@ -21,5 +22,5 @@ if __name__ == '__main__':
             for i in xrange(0, n - span):
                 k = i + span
                 span_file.write(str(idx) + ' ' + str(i) + ' ' + str(k) + '\n')
-                s = '$UNK$ <wall /> ' + ' '.join(de_sent[i:k + 1]) + ' <wall /> $UNK$'
-                txt_span_file.write(s + '\n')
+                s = '$UNK$ <wall/> ' + ' '.join(de_sent[i:k + 1]) + ' <wall/> $UNK$'
+                txt_zone_file.write(s + '\n')
