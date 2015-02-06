@@ -11,7 +11,7 @@ import kenlm as lm
 from editdistance import edscore, editdistance_prob
 
 global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords, lm_model
-hard_prune = 1
+hard_prune =10
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
