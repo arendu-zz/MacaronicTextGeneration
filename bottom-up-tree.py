@@ -10,8 +10,11 @@ from math import log, exp
 import kenlm as lm
 from editdistance import edscore, editdistance_prob
 
-global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords, lm_model
-hard_prune =10
+global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords, lm_model, weight_ed, weight_binary_nt
+weight_binary_nt = 1.0
+weight_ed = 1.0
+weight_mt = 1.0
+hard_prune = 10
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
@@ -125,12 +128,19 @@ def read_lex(lex_file):
 
 
 def get_similarity(t_x, E_y):
+    global weight_ed, weight_binary_nt
+    """
+    :param t_x: a translation candidate for de substring g_x (cast as a unary nonterminal)
+    :param E_y: a list of binary nonterminals which will become the child of current unary node
+    :return: updated t_x with  similary score
+    """
     max_ed_score = float('-inf')
     max_e_yt = None
     for e_y in E_y:
         # TODO: is editdistance_prob doing the right thing? insert/delete/substitute cost = 1/3
         # ed_score = np.log(edscore(t_x.phrase, e_y.phrase))
-        ed_score = editdistance_prob(t_x.phrase, e_y.phrase) + e_y.score  # TODO:(+e_y.score) term not suppose to be?
+        ed_score = (weight_ed * editdistance_prob(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
+        # TODO:(+e_y.score) term not suppose to be?
         if ed_score > max_ed_score:
             max_ed_score = ed_score
             max_e_yt = e_y
@@ -139,7 +149,7 @@ def get_similarity(t_x, E_y):
     # TODO: this should not just be a simple log addition
     # TODO: must learn weights for this
     try:
-        t_x.score += max_ed_score
+        t_x.score = max_ed_score + t_x.score
     except ValueError:
         pdb.set_trace()
 
@@ -173,19 +183,17 @@ def get_combinations(E_y, E_z, g_x):
     :param E_z: weighted set of translations of right child
     :return: weighted set of translations for current node
     """
-    """TODO:The weight of each such e_x is given by combining the weights of e_y and e_z
-        and then adding the MT system’s score of e_x as a translation of g_x (and adding a
-        penalty for the insertion /deletion of function words).
-
-    """
     global all_nonterminals
     nonterminals = []
     ss = {}
     for e1, e2 in it.chain(it.product(E_y, E_z), it.product(E_z, E_y)):
-        e_score, e_phrase = insert_stopword(e1, e2)  # returns best (score,phrase) with stop word insertion LM cost
+        insert_lm_score, e_phrase = insert_stopword(e1,
+                                                    e2)  # returns best (score,phrase) with stop word insertion LM cost
+        e_score = e1.score + e2.score
         i = min(e1.span[0], e2.span[0])
         k = max(e2.span[1], e2.span[1])
-        # TODO: score e_x also based on how good a translation of g_x is it,how to do this?
+        # TODO: score e_x also based on how good a translation of g_x is it, how to do this
+        # TODO: what if the phrase e_phrase does not exist in top n translations of g_x?
         current_score = ss.get(e_phrase, float('-inf'))
         if e_score > current_score:
             ss[e_phrase] = e_score
@@ -204,7 +212,6 @@ def get_combinations(E_y, E_z, g_x):
 def get_single_word_translations(g_x, sent_number, idx):
     global all_nonterminals, lex_dict, hard_prune
     nonterminals = []
-    # ss = sorted(lex_dict[g_x], reverse=True)[:hard_prune]
     ss = sorted(substring_translations[sent_number, idx, idx], reverse=True)[:hard_prune]
 
     for score, phrase in ss:
@@ -219,10 +226,7 @@ def get_single_word_translations(g_x, sent_number, idx):
         nonterminals.append(nt)
 
         nt.display_width = max(len(g_x.encode('utf-8')) + 2, len(phrase.encode('utf-8')) + 2)
-        # print g_x, phrase, len(g_x.encode('utf-8')) + 2, len(phrase.encode('utf-8')) + 2, nt.display_width, len(g_x.center(nt.display_width))
         nt.isChildTerminal = True
-        # nt.add_terminalChild(nt_german)
-
     return nonterminals
 
 
@@ -236,12 +240,12 @@ def get_human_reference(ref):
 
 
 def get_substring_translations(sent_number, i, k):
-    global substring_translations, all_nonterminals, hard_prune
+    global substring_translations, all_nonterminals, hard_prune, weight_mt
     ss = sorted(substring_translations[sent_number, i, k], reverse=True)[:hard_prune]
     nonterminals = []
     for score, phrase in ss:
         nt = NonTerminal(len(all_nonterminals), i, k)
-        nt.score = score
+        nt.score = (score * weight_mt)
         nt.phrase = phrase
         nonterminals.append(nt)
         all_nonterminals[nt.idx] = nt
