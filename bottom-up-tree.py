@@ -14,7 +14,7 @@ global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords
 weight_binary_nt = 1.0
 weight_ed = 1.0
 weight_mt = 1.0
-hard_prune = 10
+hard_prune = 1
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
@@ -264,7 +264,7 @@ def display_best_nt(node, i, k):
     print '***************************************************'
 
 
-def display_tree(root_unary, collapse_same_str=True, show_score=False):
+def display_tree(root_unary, show_span=False, collapse_same_str=True, show_score=False):
     global all_nonterminals
     print_dict = {}
     reached_leaf = []
@@ -283,15 +283,23 @@ def display_tree(root_unary, collapse_same_str=True, show_score=False):
         print_nodes.sort()
         all_print_nodes = print_nodes + reached_leaf
         all_print_nodes.sort()
-        print_line = '|'.join([pn.phrase.encode('utf-8').center(pn.display_width) for ps, pn in all_print_nodes])
+        if show_span:
+            print_line = '|'.join(
+                [str(pn.phrase.encode('utf-8') + ' ' + str(pn.span)).center(pn.display_width) for ps, pn in
+                 all_print_nodes])
+        else:
+            print_line = '|'.join([pn.phrase.encode('utf-8').center(pn.display_width) for ps, pn in all_print_nodes])
+
         print_line_num = print_dict.get(print_line, len(print_dict))
         print_dict[print_line] = print_line_num
         children_stack = next_children_stack
     leaf_line = '|'.join([pn.german_phrase.encode('utf-8').center(pn.display_width) for ps, pn in sorted(reached_leaf)])
 
     print_dict[leaf_line] = len(print_dict)
+    out_str = ''
     for l, p in sorted([(l, p) for p, l in print_dict.items()]):
-        print p
+        out_str += p + '\n'
+    return out_str
 
 
 if __name__ == '__main__':
@@ -317,6 +325,7 @@ if __name__ == '__main__':
     spans_dict = corpus_spans(options.nbest)
     stopwords = codecs.open(data_set + options.stopwords, 'r').read().split()
     lm_model = lm.LanguageModel(data_set + options.lm)
+
     for sent_num in xrange(0, 10):
         en = en_sentences[sent_num].split()
         de = de_sentences[sent_num].split()
@@ -364,7 +373,7 @@ if __name__ == '__main__':
 
             closest_unary = unary_nodes[0, n - 1][0]
             print ''
-            display_tree(closest_unary)
+            print display_tree(closest_unary, show_span=True)
             # print u'|'.join(de)
             print u''
 
