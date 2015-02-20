@@ -15,7 +15,7 @@ weight_binary_nt = 1.0
 weight_ed = 1.0
 weight_mt = 1.0
 lm_tm_tension = 0.1
-hard_prune = 1
+hard_prune = 10
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
@@ -34,31 +34,9 @@ class NonTerminal(object):
 
         self.isChildTerminal = False
         self.display_width = 0
-    """
-    def get_display_width(self, show_span):
-        global all_nonterminals
-
-        if self.isChildTerminal:
-            if show_span:
-                self.display_width = len(self.phrase) + 2 + len(str(self.span))
-            else:
-                self.display_width = len(self.phrase) + 2
-
-        else:
-            dw = 0
-            for child in [all_nonterminals[idx] for idx in self._children]:
-                dw += child.get_display_width()
-            if show_span:
-                self.display_width = max(dw, len(self.phrase) + 2 + len(str(self.span)))
-            else:
-                self.display_width = max(dw, len(self.phrase) + 2)
-
-        return self.display_width
-    """
 
     def add_terminalChild(self, nt_child):
         self._children = [nt_child.idx]
-
 
     def get_children(self):
         return self._children
@@ -217,7 +195,7 @@ def get_combinations(E_y, E_z, g_x):
     return sorted(nonterminals, reverse=True)
 
 
-def get_single_word_translations(g_x, sent_number, idx, show_span=False):
+def get_single_word_translations(g_x, sent_number, idx):
     global all_nonterminals, lex_dict, hard_prune
     nonterminals = []
     ss = sorted(substring_translations[sent_number, idx, idx], reverse=True)[:hard_prune]
@@ -232,11 +210,7 @@ def get_single_word_translations(g_x, sent_number, idx, show_span=False):
         nt.phrase = phrase
         nt.german_phrase = g_x
         nonterminals.append(nt)
-        if show_span:
-            nt.display_width = max(len(g_x.encode('utf-8')) + len(str(nt.span)) + 1,
-                                   len(phrase.encode('utf-8')) + len(str(nt.span)) + 1)
-        else:
-            nt.display_width = max(len(g_x.encode('utf-8')) + 2, len(phrase.encode('utf-8')) + 2)
+        nt.display_width = max(len(g_x.encode('utf-8')) + 2, len(phrase.encode('utf-8')) + 2)
         nt.isChildTerminal = True
     return nonterminals
 
@@ -278,6 +252,7 @@ def display_best_nt(node, i, k):
 def display_tree(root_unary, show_span=False, collapse_same_str=True, show_score=False):
     global all_nonterminals
     print_dict = {}
+    spans_dict = {}
     reached_leaf = []
     children_stack = [(root_unary.span, root_unary)]
     while len(children_stack) > 0:
@@ -294,29 +269,33 @@ def display_tree(root_unary, show_span=False, collapse_same_str=True, show_score
         print_nodes.sort()
         all_print_nodes = print_nodes + reached_leaf
         all_print_nodes.sort()
-        if show_span:
-            print_line = '|'.join(
-                [str(pn.phrase.encode('utf-8') + ' ' + str(pn.span)).center(pn.display_width) for ps, pn in
-                 all_print_nodes])
-        else:
-            print_line = '|'.join([pn.phrase.encode('utf-8').center(pn.display_width) for ps, pn in all_print_nodes])
+        # if show_span:
+        span_line = '|'.join(
+            [str(str(ps)).center(10) for ps, pn in all_print_nodes])
+        # else:
+        print_line = '|'.join([pn.phrase.encode('utf-8').center(pn.display_width) for ps, pn in all_print_nodes])
 
         print_line_num = print_dict.get(print_line, len(print_dict))
-        print_dict[print_line] = print_line_num
+        span_line_num = print_line_num
+        spans_dict[span_line_num] = span_line
+        print_dict[print_line, span_line] = print_line_num
         children_stack = next_children_stack
-    if show_span:
-        leaf_line = '|'.join(
-            [(pn.german_phrase.encode('utf-8') + ' ' + str(ps)).center(pn.display_width) for ps, pn in
-             sorted(reached_leaf)])
-    else:
-        leaf_line = '|'.join(
-            [pn.german_phrase.encode('utf-8').center(pn.display_width) for ps, pn in sorted(reached_leaf)])
+    # if show_span:
+    span_leaf_line = '|'.join(
+        [str(ps).center(10) for ps, pn in
+         sorted(reached_leaf)])
+    # else:
+    leaf_line = '|'.join(
+        [pn.german_phrase.encode('utf-8').center(pn.display_width) for ps, pn in sorted(reached_leaf)])
 
-    print_dict[leaf_line] = len(print_dict)
+    spans_dict[span_leaf_line] = len(spans_dict)
+    print_dict[leaf_line, span_leaf_line] = len(print_dict)
     out_str = ''
-    for l, p in sorted([(l, p) for p, l in print_dict.items()]):
+    out_span = ''
+    for l, p, s in sorted([(l, p, s) for (p, s), l in print_dict.items()]):
         out_str += p + '\n'
-    return out_str
+        out_span += s + '\n'
+    return out_str, out_span
 
 
 if __name__ == '__main__':
@@ -327,6 +306,7 @@ if __name__ == '__main__':
     opt.add_option("--ss", dest="substr_spans", default="train.clean.tok.true.20.de.span",
                    help="each line has a span and sent num")
     opt.add_option("-d", dest="data_set", default="data/moses-files/")
+    opt.add_option("-s", dest="show_span", action="store_true", default=False)
     opt.add_option("--sw", dest="stopwords", default="small_stopwords.txt")
     opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
     opt.add_option("--lm", dest="lm", default="train.clean.tok.true.en.arpa", help="english language model file")
@@ -338,11 +318,13 @@ if __name__ == '__main__':
     de_sentences = codecs.open(data_set + options.de_corpus, 'r', 'utf-8').readlines()
     substring_translations = read_substring_translations(data_set + options.substr_trans,
                                                          data_set + options.substr_spans)
+    show_span = options.show_span
     lex_dict = read_lex(lex_data)
     spans_dict = corpus_spans(options.nbest)
     stopwords = codecs.open(data_set + options.stopwords, 'r').read().split()
     lm_model = lm.LanguageModel(data_set + options.lm)
-    show_span = True
+    all_ds = []
+    all_dt = []
     for sent_num in xrange(0, 20):
         en = en_sentences[sent_num].split()
         de = de_sentences[sent_num].split()
@@ -354,7 +336,7 @@ if __name__ == '__main__':
             # initialize unary nodes
             n = len(de)
             for i in xrange(0, n):
-                E_x = get_single_word_translations(' '.join(de[i:i + 1]), sent_num, i, show_span=show_span)
+                E_x = get_single_word_translations(' '.join(de[i:i + 1]), sent_num, i)
                 # E_x = get_substring_translations(sent_num, i, i)  # using substring translations
                 unary_nodes[i, i] = E_x
 
@@ -389,8 +371,7 @@ if __name__ == '__main__':
                     # pdb.set_trace()
 
             closest_unary = unary_nodes[0, n - 1][0]
-            print ''
-            print display_tree(closest_unary, show_span=show_span)
-            # print u'|'.join(de)
-            print u''
-
+            dt, ds = display_tree(closest_unary, show_span=show_span)
+            all_dt.append(dt)
+            all_ds.append(ds)
+    print '\n\n'.join([dt+'\n'+ds for dt,ds in zip(all_dt,all_ds)])
