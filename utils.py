@@ -2,6 +2,10 @@ __author__ = 'arenduchintala'
 from math import exp, log, pi, sqrt
 import copy
 import numpy as np
+import pdb
+
+global punc
+punc = set(", . ? ! : ' \" ".split())
 
 
 def normpdf(x, mean, sd):
@@ -84,6 +88,33 @@ def gradient_checking(theta, eps, val):
         theta_minus[i] = theta[i] - eps
         f_approx[i] = (val(theta_plus) - val(theta_minus)) / (2 * eps)
     return f_approx
+
+
+def R(h, ref):
+    hnr = len(h.intersection(ref))
+    r = len(ref)
+    if r == 0.0:
+        return 0.0
+    return float(hnr) / r
+
+
+def P(h, ref):
+    hnr = len(h.intersection(ref))
+    h = len(h)
+    if h == 0.0:
+        return 0.0
+    return float(hnr) / h
+
+
+def get_meteor_score(h, ref, alpha=0.5):
+    global punc
+    h = set(h.split()) - punc
+    ref = set(ref.split()) - punc
+    prec = P(h, ref)
+    recall = R(h, ref)
+    if recall == 0 and prec == 0:
+        return 0.0
+    return prec * recall / (((1 - alpha) * recall) + (alpha * prec))
 
 
 if __name__ == '__main__':
