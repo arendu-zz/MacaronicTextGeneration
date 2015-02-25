@@ -371,7 +371,11 @@ if __name__ == '__main__':
                     # pdb.set_trace()
 
             closest_unary = unary_nodes[0, n - 1][0]
-            dt, ds = display_tree(closest_unary, show_span=show_span)
+            dt, ds = display_tree(closest_unary)
+            print dt
+            if show_span:
+                print ds
             all_dt.append(dt)
             all_ds.append(ds)
-    print '\n\n'.join([dt+'\n'+ds for dt,ds in zip(all_dt,all_ds)])
+    pass
+    # print '\n\n'.join([dt + '\n' + ds for dt, ds in zip(all_dt, all_ds)])
