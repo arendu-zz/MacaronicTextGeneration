@@ -9,13 +9,19 @@ import pdb
 from math import log, exp
 import kenlm as lm
 from editdistance import edscore, editdistance_prob
+from utils import get_meteor_score as meteor
 
 global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords, lm_model, weight_ed, weight_binary_nt
+global constituent_spans, weight_similarity, similarity_metric, weight_outside_similarity
+weight_outside_similarity = 1.0
+similarity_metric = "e"
+weight_similarity = 1.0
+constituent_spans = {}
 weight_binary_nt = 1.0
 weight_ed = 1.0
 weight_mt = 1.0
 lm_tm_tension = 0.1
-hard_prune = 10
+hard_prune = 3
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
@@ -114,7 +120,7 @@ def read_lex(lex_file):
 
 
 def get_similarity(t_x, E_y):
-    global weight_ed, weight_binary_nt
+    global weight_ed, weight_binary_nt, similarity_metric
     """
     :param t_x: a translation candidate for de substring g_x (cast as a unary nonterminal)
     :param E_y: a list of binary nonterminals which will become the child of current unary node
@@ -125,10 +131,13 @@ def get_similarity(t_x, E_y):
     for e_y in E_y:
         # TODO: is editdistance_prob doing the right thing? insert/delete/substitute cost = 1/3
         # ed_score = np.log(edscore(t_x.phrase, e_y.phrase))
-        ed_score = (weight_ed * editdistance_prob(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
+        if similarity_metric == "e":
+            sim_score = (weight_ed * editdistance_prob(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
+        elif similarity_metric == "m":
+            sim_score = (weight_similarity * meteor(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
         # TODO:(+e_y.score) term not suppose to be?
-        if ed_score > max_ed_score:
-            max_ed_score = ed_score
+        if sim_score > max_ed_score:
+            max_ed_score = sim_score
             max_e_yt = e_y
         else:
             pass
@@ -298,6 +307,29 @@ def display_tree(root_unary, show_span=False, collapse_same_str=True, show_score
     return out_str, out_span
 
 
+def load_constituent_spans(cons_span_file):
+    cs = {}
+    for l in open(cons_span_file, 'r').readlines():
+        idx, sym, span_str = l.split('|||')
+        k = tuple([int(i) for i in idx.split()])
+        cs[k] = sym, span_str
+    return cs
+
+
+def outside_score_prune(T_x, ref):
+    global hard_prune, weight_outside_similarity
+    S_x = []
+    for t_x in T_x:
+        if similarity_metric == "e":
+            similarity_with_ref = (weight_outside_similarity * editdistance_prob(t_x.phrase, ref)) + t_x.score
+        elif similarity_metric == "m":
+            similarity_with_ref = ( weight_outside_similarity * meteor(t_x.phrase, ref)) + t_x.score
+        S_x.append((similarity_with_ref, t_x))
+    S_x.sort()
+    T_x = [t for s, t in S_x[:hard_prune]]
+    return T_x
+
+
 if __name__ == '__main__':
     opt = OptionParser()
     opt.add_option("--ce", dest="en_corpus", default="train.clean.tok.true.20.en", help="english corpus sentences")
@@ -305,8 +337,12 @@ if __name__ == '__main__':
     opt.add_option("--st", dest="substr_trans", default="substring-translations.20.de", help="german corpus sentences")
     opt.add_option("--ss", dest="substr_spans", default="train.clean.tok.true.20.de.span",
                    help="each line has a span and sent num")
+    opt.add_option("--cs", dest="constituent_spans", default="train.clean.tok.true.20.de.parsespans")
     opt.add_option("-d", dest="data_set", default="data/moses-files/")
-    opt.add_option("-s", dest="show_span", action="store_true", default=False)
+    opt.add_option("-o", dest="do_outside_prune", action="store_true", default=False, help="do outside prune")
+    opt.add_option("-p", dest="hard_prune", type="int", default=1, help="prune applied per node")
+    opt.add_option("-s", dest="show_span", action="store_true", default=False, help="show tree spans")
+    opt.add_option("--sim", dest="similarity_metric", default="e", help="e or m for editdistance or meteor")
     opt.add_option("--sw", dest="stopwords", default="small_stopwords.txt")
     opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
     opt.add_option("--lm", dest="lm", default="train.clean.tok.true.en.arpa", help="english language model file")
@@ -318,8 +354,12 @@ if __name__ == '__main__':
     de_sentences = codecs.open(data_set + options.de_corpus, 'r', 'utf-8').readlines()
     substring_translations = read_substring_translations(data_set + options.substr_trans,
                                                          data_set + options.substr_spans)
+
+    constituent_spans = load_constituent_spans(data_set + options.constituent_spans)
+    similarity_metric = options.similarity_metric
     show_span = options.show_span
     lex_dict = read_lex(lex_data)
+    hard_prune = options.hard_prune
     spans_dict = corpus_spans(options.nbest)
     stopwords = codecs.open(data_set + options.stopwords, 'r').read().split()
     lm_model = lm.LanguageModel(data_set + options.lm)
@@ -327,6 +367,7 @@ if __name__ == '__main__':
     all_dt = []
     for sent_num in xrange(0, 20):
         en = en_sentences[sent_num].split()
+        reference_root = ' '.join(en)
         de = de_sentences[sent_num].split()
         if len(en) < 25:
             binary_nodes = {}
@@ -354,6 +395,11 @@ if __name__ == '__main__':
                         E_x += bl
                         binary_nodes[i, k] = E_x
 
+                    if options.do_outside_prune:
+                        binary_nodes[i, k] = outside_score_prune(binary_nodes[i, k], reference_root)
+                    else:
+                        binary_nodes[i, k] = sorted(binary_nodes[i, k], reverse=True)[:hard_prune]
+
                     if k == n - 1 and i == 0:
                         # when the span is the entire de sentence the "translation" is the reference en sentence
                         T_x = get_human_reference(' '.join(en))
@@ -361,14 +407,15 @@ if __name__ == '__main__':
                         T_x = get_substring_translations(sent_num, i, k)
                     E_x = []
                     for t_x in T_x:
-                        t_x = get_similarity(t_x, sorted(binary_nodes[i, k], reverse=True)[:hard_prune])
+                        t_x = get_similarity(t_x, sorted(binary_nodes[i, k], reverse=True))
                         E_x.append(t_x)
                     ul = unary_nodes.get((i, k), [])
                     E_x += ul
                     unary_nodes[i, k] = E_x
+                    assert len(unary_nodes[i, k]) <= hard_prune
 
-                    # display_best_nt(unary_nodes[i, k], i, k)
-                    # pdb.set_trace()
+                    if options.do_outside_prune:
+                        unary_nodes[i, k] = outside_score_prune(unary_nodes[i, k], reference_root)
 
             closest_unary = unary_nodes[0, n - 1][0]
             dt, ds = display_tree(closest_unary)
