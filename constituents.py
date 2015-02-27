@@ -1,5 +1,6 @@
 __author__ = 'arenduchintala'
 from nltk.tree import Tree
+import pdb
 
 
 if __name__ == '__main__':
@@ -9,8 +10,8 @@ if __name__ == '__main__':
         t.collapse_unary(collapsePOS=True, collapseRoot=True, joinChar=' | ')
         l = t.leaves()
         n = len(l)
-        for i in xrange(0, n - 1):
-            for k in xrange(i + 1, n):
+        for i in xrange(0, n):
+            for k in xrange(i + 1, n + 1):
                 span = k - i
                 nid = t.treeposition_spanning_leaves(i, k)
                 if isinstance(t[nid], Tree):
@@ -24,3 +25,5 @@ if __name__ == '__main__':
                     labels = ','.join(t[nid].label().split(' | '))
                     ps = ' '.join([str(p_idx), str(i), str(k - 1), '|||', labels, '|||', ' '.join(l[i:k])])
                     print ps
+                    # t.draw()
+                    # pdb.set_trace()
