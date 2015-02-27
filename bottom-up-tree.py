@@ -356,6 +356,7 @@ if __name__ == '__main__':
                                                          data_set + options.substr_spans)
 
     constituent_spans = load_constituent_spans(data_set + options.constituent_spans)
+
     similarity_metric = options.similarity_metric
     show_span = options.show_span
     lex_dict = read_lex(lex_data)
@@ -385,38 +386,44 @@ if __name__ == '__main__':
             for span in xrange(1, n):
                 for i in xrange(0, n - span):
                     k = i + span
-                    for j in xrange(i, k):
-                        # print 'span size', span, 'start', i, 'mid', j, 'mid', j + 1, 'end', k
-                        # print 'span gr', de[i:k], 'child1', de[i:j + 1], 'child2', de[j + 1:k + 1]
-                        E_y = unary_nodes[i, j]
-                        E_z = unary_nodes[j + 1, k]
-                        E_x = get_combinations(E_y, E_z, de[i:k + 1])
-                        bl = binary_nodes.get((i, k), [])
-                        E_x += bl
-                        binary_nodes[i, k] = E_x
+                    if (sent_num, i, k) in constituent_spans:
+                        print i, k, 'has constituent'
+                        for j in xrange(i, k):
+                            # print 'span size', span, 'start', i, 'mid', j, 'mid', j + 1, 'end', k
+                            # print 'span gr', de[i:k], 'child1', de[i:j + 1], 'child2', de[j + 1:k + 1]
+                            E_y = unary_nodes[i, j]
+                            E_z = unary_nodes[j + 1, k]
+                            E_x = get_combinations(E_y, E_z, de[i:k + 1])
+                            bl = binary_nodes.get((i, k), [])
+                            E_x += bl
+                            binary_nodes[i, k] = E_x
 
-                    if options.do_outside_prune:
-                        binary_nodes[i, k] = outside_score_prune(binary_nodes[i, k], reference_root)
+                        if options.do_outside_prune:
+                            binary_nodes[i, k] = outside_score_prune(binary_nodes[i, k], reference_root)
+                        else:
+                            binary_nodes[i, k] = sorted(binary_nodes[i, k], reverse=True)[:hard_prune]
+
+                        if k == n - 1 and i == 0:
+                            # when the span is the entire de sentence the "translation" is the reference en sentence
+                            T_x = get_human_reference(' '.join(en))
+                        else:
+                            T_x = get_substring_translations(sent_num, i, k)
+                        E_x = []
+                        for t_x in T_x:
+                            t_x = get_similarity(t_x, sorted(binary_nodes[i, k], reverse=True))
+                            E_x.append(t_x)
+                        ul = unary_nodes.get((i, k), [])
+                        E_x += ul
+                        unary_nodes[i, k] = E_x
+                        assert len(unary_nodes[i, k]) <= hard_prune
+
+                        if options.do_outside_prune:
+                            unary_nodes[i, k] = outside_score_prune(unary_nodes[i, k], reference_root)
                     else:
-                        binary_nodes[i, k] = sorted(binary_nodes[i, k], reverse=True)[:hard_prune]
-
-                    if k == n - 1 and i == 0:
-                        # when the span is the entire de sentence the "translation" is the reference en sentence
-                        T_x = get_human_reference(' '.join(en))
-                    else:
-                        T_x = get_substring_translations(sent_num, i, k)
-                    E_x = []
-                    for t_x in T_x:
-                        t_x = get_similarity(t_x, sorted(binary_nodes[i, k], reverse=True))
-                        E_x.append(t_x)
-                    ul = unary_nodes.get((i, k), [])
-                    E_x += ul
-                    unary_nodes[i, k] = E_x
-                    assert len(unary_nodes[i, k]) <= hard_prune
-
-                    if options.do_outside_prune:
-                        unary_nodes[i, k] = outside_score_prune(unary_nodes[i, k], reference_root)
-
+                        binary_nodes[i, k] = []
+                        unary_nodes[i, k] = []
+                        pass
+            pdb.set_trace()
             closest_unary = unary_nodes[0, n - 1][0]
             dt, ds = display_tree(closest_unary)
             print dt
