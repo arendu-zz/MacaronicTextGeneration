@@ -342,10 +342,12 @@ if __name__ == '__main__':
     opt.add_option("-o", dest="do_outside_prune", action="store_true", default=False, help="do outside prune")
     opt.add_option("-p", dest="hard_prune", type="int", default=1, help="prune applied per node")
     opt.add_option("-s", dest="show_span", action="store_true", default=False, help="show tree spans")
+    opt.add_option("-c", dest="use_parse_constituents", action="store_true", default=False,
+                   help="use parse constituent")
     opt.add_option("--sim", dest="similarity_metric", default="e", help="e or m for editdistance or meteor")
     opt.add_option("--sw", dest="stopwords", default="small_stopwords.txt")
     opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
-    opt.add_option("--lm", dest="lm", default="train.clean.tok.true.en.arpa", help="english language model file")
+    opt.add_option("--lm", dest="lm", default="train.clean.tok.true.en.binary", help="english language model file")
     opt.add_option("--nb", dest="nbest", default="en-n-best.txt")
     (options, _) = opt.parse_args()
     data_set = options.data_set
@@ -387,7 +389,7 @@ if __name__ == '__main__':
                 for i in xrange(0, n - span):
                     k = i + span
                     if (sent_num, i, k) in constituent_spans:
-                        print i, k, 'has constituent'
+                        #print i, k, 'has constituent'
                         for j in xrange(i, k):
                             # print 'span size', span, 'start', i, 'mid', j, 'mid', j + 1, 'end', k
                             # print 'span gr', de[i:k], 'child1', de[i:j + 1], 'child2', de[j + 1:k + 1]
@@ -423,7 +425,6 @@ if __name__ == '__main__':
                         binary_nodes[i, k] = []
                         unary_nodes[i, k] = []
                         pass
-            pdb.set_trace()
             closest_unary = unary_nodes[0, n - 1][0]
             dt, ds = display_tree(closest_unary)
             print dt
