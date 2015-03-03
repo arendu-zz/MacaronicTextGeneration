@@ -11,6 +11,10 @@ import kenlm as lm
 from editdistance import edscore, editdistance_prob
 from utils import get_meteor_score as meteor
 
+from nltk import Tree
+from nltk.draw.util import CanvasFrame
+from nltk.draw import TreeWidget
+
 global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords, lm_model, weight_ed, weight_binary_nt
 global constituent_spans, weight_similarity, similarity_metric, weight_outside_similarity
 weight_outside_similarity = 1.0
@@ -64,6 +68,20 @@ class NonTerminal(object):
             return 0
         else:
             return 1
+
+    def get_bracketed_repr(self, all_nonterminals):
+        if len(self._children) == 0:
+            return ' '.join(['(', self.phrase.encode('utf-8').replace(' ', '_'),
+                             self.german_phrase.encode('utf-8').replace(' ', '_'), ')'])
+        elif len(self._children) == 1:
+            c1 = all_nonterminals[self._children[0]]
+            return ' '.join(
+                ['(', self.phrase.encode('utf-8').replace(' ', '_'), c1.get_bracketed_repr(all_nonterminals), ')'])
+        elif len(self._children) == 2:
+            c1 = all_nonterminals[self._children[0]]
+            c2 = all_nonterminals[self._children[1]]
+            return ' '.join(['(', self.phrase.encode('utf-8').replace(' ', '_'), c1.get_bracketed_repr(
+                all_nonterminals), c2.get_bracketed_repr(all_nonterminals), ')'])
 
 
 def read_substring_translations(substring_trans_file, substring_spans_file):
@@ -258,10 +276,14 @@ def display_best_nt(node, i, k):
     print '***************************************************'
 
 
+def get_bracketed_repr(root_unary):
+    return root_unary.get_bracketed_repr()
+
+
 def display_tree(root_unary, show_span=False, collapse_same_str=True, show_score=False):
     global all_nonterminals
     print_dict = {}
-    spans_dict = {}
+    s_dict = {}
     reached_leaf = []
     children_stack = [(root_unary.span, root_unary)]
     while len(children_stack) > 0:
@@ -286,7 +308,7 @@ def display_tree(root_unary, show_span=False, collapse_same_str=True, show_score
 
         print_line_num = print_dict.get(print_line, len(print_dict))
         span_line_num = print_line_num
-        spans_dict[span_line_num] = span_line
+        s_dict[span_line_num] = span_line
         print_dict[print_line, span_line] = print_line_num
         children_stack = next_children_stack
     # if show_span:
@@ -297,7 +319,7 @@ def display_tree(root_unary, show_span=False, collapse_same_str=True, show_score
     leaf_line = '|'.join(
         [pn.german_phrase.encode('utf-8').center(pn.display_width) for ps, pn in sorted(reached_leaf)])
 
-    spans_dict[span_leaf_line] = len(spans_dict)
+    s_dict[span_leaf_line] = len(s_dict)
     print_dict[leaf_line, span_leaf_line] = len(print_dict)
     out_str = ''
     out_span = ''
@@ -309,10 +331,14 @@ def display_tree(root_unary, show_span=False, collapse_same_str=True, show_score
 
 def load_constituent_spans(cons_span_file):
     cs = {}
-    for l in open(cons_span_file, 'r').readlines():
-        idx, sym, span_str = l.split('|||')
-        k = tuple([int(i) for i in idx.split()])
-        cs[k] = sym, span_str
+    if cons_span_file is not None:
+        for l in open(cons_span_file, 'r').readlines():
+            idx, sym, span_str = l.split('|||')
+            k = tuple([int(i) for i in idx.split()])
+            cs[k] = sym, span_str
+    else:
+        # no constituent spans
+        pass
     return cs
 
 
@@ -332,40 +358,45 @@ def outside_score_prune(T_x, ref):
 
 if __name__ == '__main__':
     opt = OptionParser()
-    opt.add_option("--ce", dest="en_corpus", default="train.clean.tok.true.20.en", help="english corpus sentences")
-    opt.add_option("--cd", dest="de_corpus", default="train.clean.tok.true.20.de", help="german corpus sentences")
-    opt.add_option("--st", dest="substr_trans", default="substring-translations.20.de", help="german corpus sentences")
-    opt.add_option("--ss", dest="substr_spans", default="train.clean.tok.true.20.de.span",
+    opt.add_option("--ce", dest="en_corpus", default="data/moses-files/train.clean.tok.true.20.en",
+                   help="english corpus sentences")
+    opt.add_option("--cd", dest="de_corpus", default="data/moses-files/train.clean.tok.true.20.de",
+                   help="german corpus sentences")
+    opt.add_option("--st", dest="substr_trans", default="data/moses-files/substring-translations.20.de",
+                   help="german corpus sentences")
+    opt.add_option("--ss", dest="substr_spans", default="data/moses-files/train.clean.tok.true.20.de.span",
                    help="each line has a span and sent num")
-    opt.add_option("--cs", dest="constituent_spans", default="train.clean.tok.true.20.de.parsespans")
-    opt.add_option("-d", dest="data_set", default="data/moses-files/")
+    opt.add_option("--cs", dest="constituent_spans", default=None)
+    opt.add_option("-d", dest="", default="data/moses-files/")
     opt.add_option("-o", dest="do_outside_prune", action="store_true", default=False, help="do outside prune")
     opt.add_option("-p", dest="hard_prune", type="int", default=1, help="prune applied per node")
+    opt.add_option("-b", dest="show_bracketed", action="store_true", default=False,
+                   help="show tree in bracketed notation")
     opt.add_option("-s", dest="show_span", action="store_true", default=False, help="show tree spans")
     opt.add_option("-c", dest="use_parse_constituents", action="store_true", default=False,
                    help="use parse constituent")
     opt.add_option("--sim", dest="similarity_metric", default="e", help="e or m for editdistance or meteor")
-    opt.add_option("--sw", dest="stopwords", default="small_stopwords.txt")
-    opt.add_option("-l", dest="lex", default="model/lex", help="with extension e2f")
-    opt.add_option("--lm", dest="lm", default="train.clean.tok.true.en.binary", help="english language model file")
-    opt.add_option("--nb", dest="nbest", default="en-n-best.txt")
+    opt.add_option("--sw", dest="stopwords", default="data/moses-files/small_stopwords.txt")
+    opt.add_option("-l", dest="lex", default="data/moses-files/model/lex", help="with extension e2f")
+    opt.add_option("--lm", dest="lm", default="data/moses-files/train.clean.tok.true.en.binary",
+                   help="english language model file")
+    opt.add_option("--nb", dest="nbest", default="data/moses-files/en-n-best.txt")
     (options, _) = opt.parse_args()
-    data_set = options.data_set
-    lex_data = codecs.open(data_set + options.lex + '.e2f', 'r', 'utf-8').readlines()
-    en_sentences = codecs.open(data_set + options.en_corpus, 'r', 'utf-8').readlines()
-    de_sentences = codecs.open(data_set + options.de_corpus, 'r', 'utf-8').readlines()
-    substring_translations = read_substring_translations(data_set + options.substr_trans,
-                                                         data_set + options.substr_spans)
+    lex_data = codecs.open(options.lex + '.e2f', 'r', 'utf-8').readlines()
+    en_sentences = codecs.open(options.en_corpus, 'r', 'utf-8').readlines()
+    de_sentences = codecs.open(options.de_corpus, 'r', 'utf-8').readlines()
+    substring_translations = read_substring_translations(options.substr_trans,
+                                                         options.substr_spans)
 
-    constituent_spans = load_constituent_spans(data_set + options.constituent_spans)
-
+    constituent_spans = load_constituent_spans(options.constituent_spans)
     similarity_metric = options.similarity_metric
     show_span = options.show_span
+    show_bracketed = options.show_bracketed
     lex_dict = read_lex(lex_data)
     hard_prune = options.hard_prune
-    spans_dict = corpus_spans(options.nbest)
-    stopwords = codecs.open(data_set + options.stopwords, 'r').read().split()
-    lm_model = lm.LanguageModel(data_set + options.lm)
+    # spans_dict = corpus_spans(options.nbest)
+    stopwords = codecs.open(options.stopwords, 'r').read().split()
+    lm_model = lm.LanguageModel(options.lm)
     all_ds = []
     all_dt = []
     for sent_num in xrange(0, 20):
@@ -388,8 +419,8 @@ if __name__ == '__main__':
             for span in xrange(1, n):
                 for i in xrange(0, n - span):
                     k = i + span
-                    if (sent_num, i, k) in constituent_spans:
-                        #print i, k, 'has constituent'
+                    if (sent_num, i, k) in constituent_spans or len(constituent_spans) == 0:
+                        # print i, k, 'has constituent'
                         for j in xrange(i, k):
                             # print 'span size', span, 'start', i, 'mid', j, 'mid', j + 1, 'end', k
                             # print 'span gr', de[i:k], 'child1', de[i:j + 1], 'child2', de[j + 1:k + 1]
@@ -426,11 +457,20 @@ if __name__ == '__main__':
                         unary_nodes[i, k] = []
                         pass
             closest_unary = unary_nodes[0, n - 1][0]
+
+            # cf = CanvasFrame()
+            # t = Tree.fromstring(closest_unary.get_bracketed_repr(all_nonterminals))
+            # tc = TreeWidget(cf.canvas(), t)
+            # cf.add_widget(tc)
+            # cf.print_to_file('parsetree.' + str(sent_num) + '.ps')
+            # cf.destroy()
             dt, ds = display_tree(closest_unary)
             print dt
             if show_span:
                 print ds
+            if show_bracketed:
+                print closest_unary.get_bracketed_repr(all_nonterminals)
             all_dt.append(dt)
             all_ds.append(ds)
-    pass
-    # print '\n\n'.join([dt + '\n' + ds for dt, ds in zip(all_dt, all_ds)])
+        pass
+        # print '\n\n'.join([dt + '\n' + ds for dt, ds in zip(all_dt, all_ds)])
