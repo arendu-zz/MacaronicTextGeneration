@@ -362,7 +362,7 @@ if __name__ == '__main__':
                    help="english corpus sentences")
     opt.add_option("--cd", dest="de_corpus", default="data/moses-files/train.clean.tok.true.20.de",
                    help="german corpus sentences")
-    opt.add_option("--st", dest="substr_trans", default="data/moses-files/substring-translations.20.de",
+    opt.add_option("--st", dest="substr_trans", default="data/moses-files/substring-translations.20.en",
                    help="german corpus sentences")
     opt.add_option("--ss", dest="substr_spans", default="data/moses-files/train.clean.tok.true.20.de.span",
                    help="each line has a span and sent num")
