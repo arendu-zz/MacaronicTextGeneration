@@ -15,7 +15,7 @@ from nltk import Tree
 from nltk.draw.util import CanvasFrame
 from nltk.draw import TreeWidget
 
-global all_nonterminals, lex_dict, spans_dict, substring_translations, stopwords, lm_model, weight_ed, weight_binary_nt
+global all_nonterminals, substring_translations, stopwords, lm_model, weight_ed, weight_binary_nt
 global constituent_spans, weight_similarity, similarity_metric, weight_outside_similarity
 weight_outside_similarity = 1.0
 similarity_metric = "e"
@@ -28,8 +28,6 @@ lm_tm_tension = 0.1
 hard_prune = 3
 stopwords = []
 all_nonterminals = {}
-lex_dict = {}
-spans_dict = {}
 substring_translations = {}
 
 
@@ -125,17 +123,6 @@ def corpus_spans(nbest):
     return span_dict
 
 
-def read_lex(lex_file):
-    global lex_dict
-    lex_dict = {}
-    for l in lex_file:
-        parts = l.split()
-        en = parts[0].strip()
-        fr = parts[1].strip()
-        score = log(float(parts[2]))
-        lex_dict[fr] = lex_dict.get(fr, []) + [(score, en)]
-    return lex_dict
-
 
 def get_similarity(t_x, E_y):
     global weight_ed, weight_binary_nt, similarity_metric
@@ -223,7 +210,7 @@ def get_combinations(E_y, E_z, g_x):
 
 
 def get_single_word_translations(g_x, sent_number, idx):
-    global all_nonterminals, lex_dict, hard_prune
+    global all_nonterminals, hard_prune
     nonterminals = []
     ss = sorted(substring_translations[sent_number, idx, idx], reverse=True)[:hard_prune]
 
@@ -362,7 +349,7 @@ if __name__ == '__main__':
                    help="english corpus sentences")
     opt.add_option("--cd", dest="de_corpus", default="data/moses-files/train.clean.tok.true.20.de",
                    help="german corpus sentences")
-    opt.add_option("--st", dest="substr_trans", default="data/moses-files/substring-translations.20.en",
+    opt.add_option("--st", dest="substr_trans", default="data/moses-files/substring-translations.20.tuned.en",
                    help="german corpus sentences")
     opt.add_option("--ss", dest="substr_spans", default="data/moses-files/train.clean.tok.true.20.de.span",
                    help="each line has a span and sent num")
@@ -377,12 +364,9 @@ if __name__ == '__main__':
                    help="use parse constituent")
     opt.add_option("--sim", dest="similarity_metric", default="e", help="e or m for editdistance or meteor")
     opt.add_option("--sw", dest="stopwords", default="data/moses-files/small_stopwords.txt")
-    opt.add_option("-l", dest="lex", default="data/moses-files/model/lex", help="with extension e2f")
     opt.add_option("--lm", dest="lm", default="data/moses-files/train.clean.tok.true.en.binary",
                    help="english language model file")
-    opt.add_option("--nb", dest="nbest", default="data/moses-files/en-n-best.txt")
     (options, _) = opt.parse_args()
-    lex_data = codecs.open(options.lex + '.e2f', 'r', 'utf-8').readlines()
     en_sentences = codecs.open(options.en_corpus, 'r', 'utf-8').readlines()
     de_sentences = codecs.open(options.de_corpus, 'r', 'utf-8').readlines()
     substring_translations = read_substring_translations(options.substr_trans,
@@ -392,9 +376,7 @@ if __name__ == '__main__':
     similarity_metric = options.similarity_metric
     show_span = options.show_span
     show_bracketed = options.show_bracketed
-    lex_dict = read_lex(lex_data)
     hard_prune = options.hard_prune
-    # spans_dict = corpus_spans(options.nbest)
     stopwords = codecs.open(options.stopwords, 'r').read().split()
     lm_model = lm.LanguageModel(options.lm)
     all_ds = []
