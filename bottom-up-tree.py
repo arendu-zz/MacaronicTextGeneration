@@ -91,17 +91,20 @@ def read_substring_translations(substring_trans_file, substring_spans_file):
     trans_by_span = {}
     for l in codecs.open(substring_trans_file, 'r', 'utf-8').readlines():
         parts = l.split('|||')
-        line_num = int(parts[0])
-
         trans = ' '.join(parts[1].split()[1:-1])
-        tm_score = sum([float(s) for s in parts[-2].split()[-4:]])
-        lm_score = float(parts[-1])
-        score = lm_tm_tension * lm_score + (1 - lm_tm_tension) * tm_score
+        line_num = int(parts[0])
+        #all_score_keys = [ p for p in parts[2].split()) if p.strip().endswith('=') ]
+        #all_score_val_strings = [ p for i,p in enumerate(parts[2].split("=")) if i%2 !=0 ]
+        #pdb.set_trace()
+        #tm_score = sum([float(s) for s in parts[-2].split()[-4:]])
+        #lm_score = float(parts[-1])
+        #score = lm_tm_tension * lm_score + (1 - lm_tm_tension) * tm_score
 
+        final_score = float(parts[-1].strip())
         span_num = spans_by_line_num[line_num]
         # print span_num, trans, score
         trans_for_line = trans_by_span.get(span_num, [])
-        trans_for_line.append((score, trans))
+        trans_for_line.append((final_score, trans))
         trans_by_span[span_num] = trans_for_line
     return trans_by_span
 
@@ -349,7 +352,7 @@ if __name__ == '__main__':
                    help="english corpus sentences")
     opt.add_option("--cd", dest="de_corpus", default="data/moses-files/train.clean.tok.true.20.de",
                    help="german corpus sentences")
-    opt.add_option("--st", dest="substr_trans", default="data/moses-files/substring-translations.20.tuned.en",
+    opt.add_option("--st", dest="substr_trans", default="data/moses-files/substring-translations.20.tuned.ch.clean.en",
                    help="german corpus sentences")
     opt.add_option("--ss", dest="substr_spans", default="data/moses-files/train.clean.tok.true.20.de.span",
                    help="each line has a span and sent num")
