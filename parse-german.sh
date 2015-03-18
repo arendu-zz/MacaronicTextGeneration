@@ -1,5 +1,5 @@
 #!/bin/sh
-source config.cfg
+source ./config.cfg
 #PARSER_OPTIONS="-binarize -confidence -kbest 10"
 PARSER_OPTIONS="-binarize "
 JAVA_OPTIONS="-XX:MaxPermSize=1024m -XX:MaxHeapSize=4048m"

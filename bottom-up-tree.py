@@ -379,7 +379,7 @@ if __name__ == '__main__':
     similarity_metric = options.similarity_metric
     show_span = options.show_span
     show_bracketed = options.show_bracketed
-    save_nltk_tree_img = True
+    save_nltk_tree_img = False 
     hard_prune = options.hard_prune
     stopwords = codecs.open(options.stopwords, 'r').read().split()
     lm_model = lm.LanguageModel(options.lm)
