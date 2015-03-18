@@ -1,15 +1,16 @@
 __author__ = 'arenduchintala'
-from optparse import OptionParse
+
+from optparse import OptionParser
 from nltk.tree import Tree
 import pdb
 
 
 if __name__ == '__main__':
     opt = OptionParser()
-    opt.add_option("-p", dest="parse", default="data/moses/train.clean.tok.true.20.de.parse")
+    opt.add_option("-p", dest="parse", default="data/projectsyndicate/projectsyndicate.clean.de.20.parse")
     (options, _) = opt.parse_args()
-    parses = open(options.parse,'r').readlines()
-
+    parses = open(options.parse, 'r').readlines()
+    parsespans = open(options.parse + '.spans', 'w')
     for p_idx, p in enumerate(parses):
         t = Tree.fromstring(p, remove_empty_top_bracketing=True)
         t.collapse_unary(collapsePOS=True, collapseRoot=True, joinChar=' | ')
@@ -23,12 +24,14 @@ if __name__ == '__main__':
                     if len(t[nid].leaves()) == span:
                         labels = ','.join(t[nid].label().split(' | '))
                         ps = ' '.join([str(p_idx), str(i), str(k - 1), '|||', labels, '|||', ' '.join(l[i:k])])
-                        print ps
+                        # print ps
+                        parsespans.write(ps + '\n')
 
                 if isinstance(t[nid], str):
                     nid = nid[:-1]
                     labels = ','.join(t[nid].label().split(' | '))
                     ps = ' '.join([str(p_idx), str(i), str(k - 1), '|||', labels, '|||', ' '.join(l[i:k])])
-                    print ps
+                    # print ps
+                    parsespans.write(ps + '\n')
                     # t.draw()
                     # pdb.set_trace()
