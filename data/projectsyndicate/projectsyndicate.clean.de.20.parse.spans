@@ -1,0 +1,722 @@
+0 0 0 ||| NN ||| SAN
+0 0 2 ||| NP ||| SAN FRANCISCO –
+0 0 19 ||| PSEUDO ||| SAN FRANCISCO – Es war noch nie leicht , ein rationales Gespräch über den Wert von Gold zu führen .
+0 1 1 ||| NE ||| FRANCISCO
+0 1 2 ||| MPN ||| FRANCISCO –
+0 2 2 ||| NE ||| –
+0 3 3 ||| PPER ||| Es
+0 3 18 ||| S ||| Es war noch nie leicht , ein rationales Gespräch über den Wert von Gold zu führen
+0 3 19 ||| @PSEUDO ||| Es war noch nie leicht , ein rationales Gespräch über den Wert von Gold zu führen .
+0 4 4 ||| VAFIN ||| war
+0 4 18 ||| @S ||| war noch nie leicht , ein rationales Gespräch über den Wert von Gold zu führen
+0 5 5 ||| ADV ||| noch
+0 5 6 ||| AVP ||| noch nie
+0 5 18 ||| @S ||| noch nie leicht , ein rationales Gespräch über den Wert von Gold zu führen
+0 6 6 ||| ADV ||| nie
+0 7 7 ||| ADJD ||| leicht
+0 7 18 ||| @S ||| leicht , ein rationales Gespräch über den Wert von Gold zu führen
+0 8 8 ||| $, ||| ,
+0 8 18 ||| @S ||| , ein rationales Gespräch über den Wert von Gold zu führen
+0 9 9 ||| ART ||| ein
+0 9 11 ||| NP ||| ein rationales Gespräch
+0 9 18 ||| VP ||| ein rationales Gespräch über den Wert von Gold zu führen
+0 10 10 ||| ADJA ||| rationales
+0 10 11 ||| @NP ||| rationales Gespräch
+0 11 11 ||| NN ||| Gespräch
+0 12 12 ||| ADJD ||| über
+0 12 18 ||| @VP ||| über den Wert von Gold zu führen
+0 13 13 ||| ART ||| den
+0 13 16 ||| NP ||| den Wert von Gold
+0 13 18 ||| @VP ||| den Wert von Gold zu führen
+0 14 14 ||| NN ||| Wert
+0 14 16 ||| @NP ||| Wert von Gold
+0 15 15 ||| APPR ||| von
+0 15 16 ||| PP ||| von Gold
+0 16 16 ||| NN ||| Gold
+0 17 17 ||| PTKZU ||| zu
+0 17 18 ||| VZ ||| zu führen
+0 18 18 ||| VVINF ||| führen
+0 19 19 ||| $. ||| .
+1 0 0 ||| APPR ||| In
+1 0 2 ||| PP ||| In letzter Zeit
+1 0 8 ||| S ||| In letzter Zeit allerdings ist dies schwieriger denn je
+1 0 21 ||| CS ||| In letzter Zeit allerdings ist dies schwieriger denn je , ist doch der Goldpreis im letzten Jahrzehnt um über 300 Prozent angestiegen
+1 0 22 ||| PSEUDO ||| In letzter Zeit allerdings ist dies schwieriger denn je , ist doch der Goldpreis im letzten Jahrzehnt um über 300 Prozent angestiegen .
+1 1 1 ||| ADJA ||| letzter
+1 1 2 ||| @PP ||| letzter Zeit
+1 2 2 ||| NN ||| Zeit
+1 3 3 ||| ADV ||| allerdings
+1 3 8 ||| @S ||| allerdings ist dies schwieriger denn je
+1 4 4 ||| VAFIN ||| ist
+1 4 8 ||| @S ||| ist dies schwieriger denn je
+1 5 5 ||| PDS ||| dies
+1 5 8 ||| @S ||| dies schwieriger denn je
+1 6 6 ||| ADJD ||| schwieriger
+1 6 8 ||| @S ||| schwieriger denn je
+1 7 7 ||| ADV ||| denn
+1 7 8 ||| @S ||| denn je
+1 8 8 ||| ADV ||| je
+1 9 9 ||| $, ||| ,
+1 9 21 ||| @CS ||| , ist doch der Goldpreis im letzten Jahrzehnt um über 300 Prozent angestiegen
+1 10 10 ||| VAFIN ||| ist
+1 10 21 ||| S ||| ist doch der Goldpreis im letzten Jahrzehnt um über 300 Prozent angestiegen
+1 11 11 ||| ADV ||| doch
+1 11 21 ||| @S ||| doch der Goldpreis im letzten Jahrzehnt um über 300 Prozent angestiegen
+1 12 12 ||| ART ||| der
+1 12 13 ||| NP ||| der Goldpreis
+1 12 21 ||| @S ||| der Goldpreis im letzten Jahrzehnt um über 300 Prozent angestiegen
+1 13 13 ||| NN ||| Goldpreis
+1 14 14 ||| APPRART ||| im
+1 14 16 ||| PP ||| im letzten Jahrzehnt
+1 14 21 ||| VP ||| im letzten Jahrzehnt um über 300 Prozent angestiegen
+1 15 15 ||| ADJA ||| letzten
+1 15 16 ||| @PP ||| letzten Jahrzehnt
+1 16 16 ||| NN ||| Jahrzehnt
+1 17 17 ||| APPR ||| um
+1 17 20 ||| PP ||| um über 300 Prozent
+1 17 21 ||| @VP ||| um über 300 Prozent angestiegen
+1 18 18 ||| ADJA ||| über
+1 18 20 ||| @PP ||| über 300 Prozent
+1 19 19 ||| CARD ||| 300
+1 19 20 ||| @PP ||| 300 Prozent
+1 20 20 ||| NN ||| Prozent
+1 21 21 ||| VVPP ||| angestiegen
+1 22 22 ||| $. ||| .
+2 0 0 ||| ADV ||| Erst
+2 0 2 ||| NP ||| Erst letzten Dezember
+2 0 30 ||| S ||| Erst letzten Dezember verfassten meine Kollegen Martin Feldstein und Nouriel Roubini Kommentare , in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 0 31 ||| PSEUDO ||| Erst letzten Dezember verfassten meine Kollegen Martin Feldstein und Nouriel Roubini Kommentare , in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen .
+2 1 1 ||| ADJA ||| letzten
+2 1 2 ||| @NP ||| letzten Dezember
+2 2 2 ||| NN ||| Dezember
+2 3 3 ||| VVFIN ||| verfassten
+2 3 30 ||| @S ||| verfassten meine Kollegen Martin Feldstein und Nouriel Roubini Kommentare , in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 4 4 ||| PPOSAT ||| meine
+2 4 7 ||| NP ||| meine Kollegen Martin Feldstein
+2 4 30 ||| CNP ||| meine Kollegen Martin Feldstein und Nouriel Roubini Kommentare , in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 5 5 ||| NN ||| Kollegen
+2 5 7 ||| @NP ||| Kollegen Martin Feldstein
+2 6 6 ||| NE ||| Martin
+2 6 7 ||| MPN ||| Martin Feldstein
+2 7 7 ||| NE ||| Feldstein
+2 8 8 ||| KON ||| und
+2 8 30 ||| @CNP ||| und Nouriel Roubini Kommentare , in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 9 9 ||| NN ||| Nouriel
+2 9 30 ||| NP ||| Nouriel Roubini Kommentare , in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 10 10 ||| NE ||| Roubini
+2 10 11 ||| MPN ||| Roubini Kommentare
+2 10 30 ||| @NP ||| Roubini Kommentare , in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 11 11 ||| NE ||| Kommentare
+2 12 12 ||| $, ||| ,
+2 12 30 ||| @NP ||| , in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 13 13 ||| APPR ||| in
+2 13 14 ||| PP ||| in denen
+2 13 21 ||| S ||| in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten
+2 13 30 ||| CS ||| in denen sie mutig die vorherrschende optimistische Marktstimmung hinterfragten und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 14 14 ||| PRELS ||| denen
+2 15 15 ||| PPER ||| sie
+2 15 21 ||| @S ||| sie mutig die vorherrschende optimistische Marktstimmung hinterfragten
+2 16 16 ||| ADJD ||| mutig
+2 16 21 ||| @S ||| mutig die vorherrschende optimistische Marktstimmung hinterfragten
+2 17 17 ||| ART ||| die
+2 17 20 ||| NP ||| die vorherrschende optimistische Marktstimmung
+2 17 21 ||| @S ||| die vorherrschende optimistische Marktstimmung hinterfragten
+2 18 18 ||| ADJD ||| vorherrschende
+2 18 19 ||| AP ||| vorherrschende optimistische
+2 18 20 ||| @NP ||| vorherrschende optimistische Marktstimmung
+2 19 19 ||| ADJA ||| optimistische
+2 20 20 ||| NN ||| Marktstimmung
+2 21 21 ||| VVFIN ||| hinterfragten
+2 22 22 ||| KON ||| und
+2 22 30 ||| @CS ||| und sehr überlegt auf die Risiken des Goldes hinwiesen
+2 23 23 ||| ADV ||| sehr
+2 23 24 ||| AP ||| sehr überlegt
+2 23 30 ||| S ||| sehr überlegt auf die Risiken des Goldes hinwiesen
+2 24 24 ||| ADJD ||| überlegt
+2 25 25 ||| APPR ||| auf
+2 25 29 ||| PP ||| auf die Risiken des Goldes
+2 25 30 ||| @S ||| auf die Risiken des Goldes hinwiesen
+2 26 26 ||| ART ||| die
+2 26 29 ||| @PP ||| die Risiken des Goldes
+2 27 27 ||| NN ||| Risiken
+2 27 29 ||| @PP ||| Risiken des Goldes
+2 28 28 ||| ART ||| des
+2 28 29 ||| NP ||| des Goldes
+2 29 29 ||| NN ||| Goldes
+2 30 30 ||| VVFIN ||| hinwiesen
+2 31 31 ||| $. ||| .
+3 0 0 ||| KON ||| Und
+3 0 7 ||| S ||| Und es kam , wie es kommen musste
+3 0 8 ||| PSEUDO ||| Und es kam , wie es kommen musste .
+3 1 1 ||| PPER ||| es
+3 1 7 ||| @S ||| es kam , wie es kommen musste
+3 2 2 ||| VVFIN ||| kam
+3 2 7 ||| @S ||| kam , wie es kommen musste
+3 3 3 ||| $, ||| ,
+3 3 7 ||| @S ||| , wie es kommen musste
+3 4 4 ||| PWAV ||| wie
+3 4 7 ||| S ||| wie es kommen musste
+3 5 5 ||| PPER ||| es
+3 5 7 ||| @S ||| es kommen musste
+3 6 6 ||| VVINF ||| kommen
+3 6 7 ||| @S ||| kommen musste
+3 7 7 ||| VAFIN ||| musste
+3 8 8 ||| $. ||| .
+4 0 0 ||| APPR ||| Seit
+4 0 4 ||| PP ||| Seit der Veröffentlichung ihrer Artikel
+4 0 10 ||| S ||| Seit der Veröffentlichung ihrer Artikel ist der Goldpreis noch weiter gestiegen
+4 0 11 ||| PSEUDO ||| Seit der Veröffentlichung ihrer Artikel ist der Goldpreis noch weiter gestiegen .
+4 1 1 ||| ART ||| der
+4 1 4 ||| @PP ||| der Veröffentlichung ihrer Artikel
+4 2 2 ||| NN ||| Veröffentlichung
+4 2 4 ||| @PP ||| Veröffentlichung ihrer Artikel
+4 3 3 ||| PPOSAT ||| ihrer
+4 3 4 ||| NP ||| ihrer Artikel
+4 4 4 ||| NN ||| Artikel
+4 5 5 ||| VAFIN ||| ist
+4 5 10 ||| @S ||| ist der Goldpreis noch weiter gestiegen
+4 6 6 ||| ART ||| der
+4 6 7 ||| NP ||| der Goldpreis
+4 6 10 ||| @S ||| der Goldpreis noch weiter gestiegen
+4 7 7 ||| NN ||| Goldpreis
+4 8 8 ||| ADV ||| noch
+4 8 10 ||| @S ||| noch weiter gestiegen
+4 9 9 ||| ADJD ||| weiter
+4 9 10 ||| VP ||| weiter gestiegen
+4 10 10 ||| VVPP ||| gestiegen
+4 11 11 ||| $. ||| .
+5 0 0 ||| ADV ||| Jüngst
+5 0 8 ||| S ||| Jüngst erreichte er sogar ein Rekordhoch von 1.300 Dollar
+5 0 9 ||| PSEUDO ||| Jüngst erreichte er sogar ein Rekordhoch von 1.300 Dollar .
+5 1 1 ||| VVFIN ||| erreichte
+5 1 8 ||| @S ||| erreichte er sogar ein Rekordhoch von 1.300 Dollar
+5 2 2 ||| PPER ||| er
+5 2 8 ||| @S ||| er sogar ein Rekordhoch von 1.300 Dollar
+5 3 3 ||| ADV ||| sogar
+5 3 8 ||| NP ||| sogar ein Rekordhoch von 1.300 Dollar
+5 4 4 ||| ART ||| ein
+5 4 8 ||| @NP ||| ein Rekordhoch von 1.300 Dollar
+5 5 5 ||| NN ||| Rekordhoch
+5 5 8 ||| @NP ||| Rekordhoch von 1.300 Dollar
+5 6 6 ||| APPR ||| von
+5 6 8 ||| PP ||| von 1.300 Dollar
+5 7 7 ||| CARD ||| 1.300
+5 7 8 ||| @PP ||| 1.300 Dollar
+5 8 8 ||| NN ||| Dollar
+5 9 9 ||| $. ||| .
+6 0 0 ||| APPRART ||| Im
+6 0 2 ||| PP ||| Im letzten Dezember
+6 0 16 ||| S ||| Im letzten Dezember argumentierten die Goldbugs , dass der Preis zweifellos in Richtung 2.000 Dollar gehen würde
+6 0 17 ||| PSEUDO ||| Im letzten Dezember argumentierten die Goldbugs , dass der Preis zweifellos in Richtung 2.000 Dollar gehen würde .
+6 1 1 ||| ADJA ||| letzten
+6 1 2 ||| @PP ||| letzten Dezember
+6 2 2 ||| NN ||| Dezember
+6 3 3 ||| VVFIN ||| argumentierten
+6 3 16 ||| @S ||| argumentierten die Goldbugs , dass der Preis zweifellos in Richtung 2.000 Dollar gehen würde
+6 4 4 ||| ART ||| die
+6 4 5 ||| NP ||| die Goldbugs
+6 4 16 ||| @S ||| die Goldbugs , dass der Preis zweifellos in Richtung 2.000 Dollar gehen würde
+6 5 5 ||| NN ||| Goldbugs
+6 6 6 ||| $, ||| ,
+6 6 16 ||| @S ||| , dass der Preis zweifellos in Richtung 2.000 Dollar gehen würde
+6 7 7 ||| KOUS ||| dass
+6 7 16 ||| S ||| dass der Preis zweifellos in Richtung 2.000 Dollar gehen würde
+6 8 8 ||| ART ||| der
+6 8 9 ||| NP ||| der Preis
+6 8 16 ||| @S ||| der Preis zweifellos in Richtung 2.000 Dollar gehen würde
+6 9 9 ||| NN ||| Preis
+6 10 10 ||| ADJD ||| zweifellos
+6 10 15 ||| VP ||| zweifellos in Richtung 2.000 Dollar gehen
+6 10 16 ||| @S ||| zweifellos in Richtung 2.000 Dollar gehen würde
+6 11 11 ||| APPR ||| in
+6 11 14 ||| PP ||| in Richtung 2.000 Dollar
+6 11 15 ||| @VP ||| in Richtung 2.000 Dollar gehen
+6 12 12 ||| NN ||| Richtung
+6 12 14 ||| @PP ||| Richtung 2.000 Dollar
+6 13 13 ||| CARD ||| 2.000
+6 13 14 ||| @PP ||| 2.000 Dollar
+6 14 14 ||| NN ||| Dollar
+6 15 15 ||| VVINF ||| gehen
+6 16 16 ||| VMFIN ||| würde
+6 17 17 ||| $. ||| .
+7 0 0 ||| NN ||| Beflügelt
+7 0 17 ||| S ||| Beflügelt aufgrund des anhaltenden Aufwärtstrends , meint man nun mancherorts , dass Gold sogar noch höher steigen könnte
+7 0 18 ||| PSEUDO ||| Beflügelt aufgrund des anhaltenden Aufwärtstrends , meint man nun mancherorts , dass Gold sogar noch höher steigen könnte .
+7 1 1 ||| APPR ||| aufgrund
+7 1 4 ||| PP ||| aufgrund des anhaltenden Aufwärtstrends
+7 1 17 ||| @S ||| aufgrund des anhaltenden Aufwärtstrends , meint man nun mancherorts , dass Gold sogar noch höher steigen könnte
+7 2 2 ||| ART ||| des
+7 2 4 ||| @PP ||| des anhaltenden Aufwärtstrends
+7 3 3 ||| ADJA ||| anhaltenden
+7 3 4 ||| @PP ||| anhaltenden Aufwärtstrends
+7 4 4 ||| NN ||| Aufwärtstrends
+7 5 5 ||| $, ||| ,
+7 5 17 ||| @S ||| , meint man nun mancherorts , dass Gold sogar noch höher steigen könnte
+7 6 6 ||| VVFIN ||| meint
+7 6 17 ||| @S ||| meint man nun mancherorts , dass Gold sogar noch höher steigen könnte
+7 7 7 ||| PIS ||| man
+7 7 17 ||| @S ||| man nun mancherorts , dass Gold sogar noch höher steigen könnte
+7 8 8 ||| ADV ||| nun
+7 8 17 ||| @S ||| nun mancherorts , dass Gold sogar noch höher steigen könnte
+7 9 9 ||| ADV ||| mancherorts
+7 9 17 ||| @S ||| mancherorts , dass Gold sogar noch höher steigen könnte
+7 10 10 ||| $, ||| ,
+7 10 17 ||| @S ||| , dass Gold sogar noch höher steigen könnte
+7 11 11 ||| KOUS ||| dass
+7 11 17 ||| S ||| dass Gold sogar noch höher steigen könnte
+7 12 12 ||| NN ||| Gold
+7 12 17 ||| @S ||| Gold sogar noch höher steigen könnte
+7 13 13 ||| ADV ||| sogar
+7 13 16 ||| NP ||| sogar noch höher steigen
+7 13 17 ||| @S ||| sogar noch höher steigen könnte
+7 14 14 ||| ADV ||| noch
+7 14 16 ||| @NP ||| noch höher steigen
+7 15 15 ||| ADJA ||| höher
+7 15 16 ||| @NP ||| höher steigen
+7 16 16 ||| NN ||| steigen
+7 17 17 ||| VVFIN ||| könnte
+7 18 18 ||| $. ||| .
+8 0 0 ||| ART ||| Ein
+8 0 4 ||| NP ||| Ein erfolgreicher Gold @-@ Investor
+8 0 35 ||| S ||| Ein erfolgreicher Gold @-@ Investor erklärte mir vor kurzem , dass die Aktienkurse über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 0 36 ||| PSEUDO ||| Ein erfolgreicher Gold @-@ Investor erklärte mir vor kurzem , dass die Aktienkurse über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt .
+8 1 1 ||| ADJA ||| erfolgreicher
+8 1 4 ||| @NP ||| erfolgreicher Gold @-@ Investor
+8 2 2 ||| NN ||| Gold
+8 2 4 ||| @NP ||| Gold @-@ Investor
+8 3 3 ||| ADJA ||| @-@
+8 3 4 ||| NP ||| @-@ Investor
+8 4 4 ||| NN ||| Investor
+8 5 5 ||| VVFIN ||| erklärte
+8 5 35 ||| @S ||| erklärte mir vor kurzem , dass die Aktienkurse über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 6 6 ||| PPER ||| mir
+8 6 35 ||| @S ||| mir vor kurzem , dass die Aktienkurse über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 7 7 ||| APPR ||| vor
+8 7 8 ||| PP ||| vor kurzem
+8 7 35 ||| @S ||| vor kurzem , dass die Aktienkurse über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 8 8 ||| ADJA ||| kurzem
+8 9 9 ||| $, ||| ,
+8 9 35 ||| @S ||| , dass die Aktienkurse über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 10 10 ||| KOUS ||| dass
+8 10 35 ||| S ||| dass die Aktienkurse über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 11 11 ||| ART ||| die
+8 11 12 ||| NP ||| die Aktienkurse
+8 11 35 ||| @S ||| die Aktienkurse über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 12 12 ||| NN ||| Aktienkurse
+8 13 13 ||| ADV ||| über
+8 13 35 ||| @S ||| über ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 14 14 ||| ART ||| ein
+8 14 15 ||| NP ||| ein Jahrzehnt
+8 14 16 ||| AP ||| ein Jahrzehnt dahingedümpelt
+8 14 35 ||| @S ||| ein Jahrzehnt dahingedümpelt waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 15 15 ||| NN ||| Jahrzehnt
+8 16 16 ||| ADJD ||| dahingedümpelt
+8 17 17 ||| VAFIN ||| waren
+8 17 35 ||| @S ||| waren , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 18 18 ||| $, ||| ,
+8 18 35 ||| @S ||| , bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 19 19 ||| KOUS ||| bevor
+8 19 35 ||| S ||| bevor der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 20 20 ||| ART ||| der
+8 20 24 ||| NP ||| der Dow Jones @-@ Index
+8 20 35 ||| @S ||| der Dow Jones @-@ Index in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 21 21 ||| NE ||| Dow
+8 21 22 ||| MPN ||| Dow Jones
+8 21 24 ||| @NP ||| Dow Jones @-@ Index
+8 22 22 ||| NE ||| Jones
+8 23 23 ||| ADJA ||| @-@
+8 23 24 ||| @NP ||| @-@ Index
+8 24 24 ||| NN ||| Index
+8 25 25 ||| APPR ||| in
+8 25 29 ||| PP ||| in den frühen 1980er Jahren
+8 25 35 ||| @S ||| in den frühen 1980er Jahren die Marke von 1.000 Punkten überschritt
+8 26 26 ||| ART ||| den
+8 26 29 ||| @PP ||| den frühen 1980er Jahren
+8 27 27 ||| ADJA ||| frühen
+8 27 29 ||| @PP ||| frühen 1980er Jahren
+8 28 28 ||| ADJA ||| 1980er
+8 28 29 ||| @PP ||| 1980er Jahren
+8 29 29 ||| NN ||| Jahren
+8 30 30 ||| ART ||| die
+8 30 34 ||| NP ||| die Marke von 1.000 Punkten
+8 30 35 ||| @S ||| die Marke von 1.000 Punkten überschritt
+8 31 31 ||| NN ||| Marke
+8 31 34 ||| @NP ||| Marke von 1.000 Punkten
+8 32 32 ||| APPR ||| von
+8 32 34 ||| PP ||| von 1.000 Punkten
+8 33 33 ||| CARD ||| 1.000
+8 33 34 ||| @PP ||| 1.000 Punkten
+8 34 34 ||| NN ||| Punkten
+8 35 35 ||| VVFIN ||| überschritt
+8 36 36 ||| $. ||| .
+9 0 0 ||| APPR ||| Seit
+9 0 1 ||| PP ||| Seit damals
+9 0 8 ||| S ||| Seit damals ist er auf über 10.000 Punkte gestiegen
+9 0 9 ||| PSEUDO ||| Seit damals ist er auf über 10.000 Punkte gestiegen .
+9 1 1 ||| ADV ||| damals
+9 2 2 ||| VAFIN ||| ist
+9 2 8 ||| @S ||| ist er auf über 10.000 Punkte gestiegen
+9 3 3 ||| PPER ||| er
+9 3 8 ||| @S ||| er auf über 10.000 Punkte gestiegen
+9 4 4 ||| APPR ||| auf
+9 4 7 ||| PP ||| auf über 10.000 Punkte
+9 4 8 ||| @S ||| auf über 10.000 Punkte gestiegen
+9 5 5 ||| ADJA ||| über
+9 5 7 ||| @PP ||| über 10.000 Punkte
+9 6 6 ||| CARD ||| 10.000
+9 6 7 ||| @PP ||| 10.000 Punkte
+9 7 7 ||| NN ||| Punkte
+9 8 8 ||| VVPP ||| gestiegen
+9 9 9 ||| $. ||| .
+10 0 0 ||| ADV ||| Nun
+10 0 9 ||| S ||| Nun hat Gold die magische Grenze von 1.000 Dollar überschritten
+10 0 19 ||| CS ||| Nun hat Gold die magische Grenze von 1.000 Dollar überschritten , warum sollte sich sein Wert daher nicht auch verzehnfachen
+10 0 20 ||| PSEUDO ||| Nun hat Gold die magische Grenze von 1.000 Dollar überschritten , warum sollte sich sein Wert daher nicht auch verzehnfachen ?
+10 1 1 ||| VAFIN ||| hat
+10 1 9 ||| @S ||| hat Gold die magische Grenze von 1.000 Dollar überschritten
+10 2 2 ||| NN ||| Gold
+10 2 9 ||| @S ||| Gold die magische Grenze von 1.000 Dollar überschritten
+10 3 3 ||| ART ||| die
+10 3 8 ||| NP ||| die magische Grenze von 1.000 Dollar
+10 3 9 ||| AP ||| die magische Grenze von 1.000 Dollar überschritten
+10 4 4 ||| ADJA ||| magische
+10 4 8 ||| @NP ||| magische Grenze von 1.000 Dollar
+10 5 5 ||| NN ||| Grenze
+10 5 8 ||| @NP ||| Grenze von 1.000 Dollar
+10 6 6 ||| APPR ||| von
+10 6 8 ||| PP ||| von 1.000 Dollar
+10 7 7 ||| CARD ||| 1.000
+10 7 8 ||| @PP ||| 1.000 Dollar
+10 8 8 ||| NN ||| Dollar
+10 9 9 ||| ADJD ||| überschritten
+10 10 10 ||| $, ||| ,
+10 10 19 ||| @CS ||| , warum sollte sich sein Wert daher nicht auch verzehnfachen
+10 11 11 ||| PWAV ||| warum
+10 11 19 ||| S ||| warum sollte sich sein Wert daher nicht auch verzehnfachen
+10 12 12 ||| VMFIN ||| sollte
+10 12 19 ||| @S ||| sollte sich sein Wert daher nicht auch verzehnfachen
+10 13 13 ||| PRF ||| sich
+10 13 19 ||| @S ||| sich sein Wert daher nicht auch verzehnfachen
+10 14 14 ||| PPOSAT ||| sein
+10 14 15 ||| NP ||| sein Wert
+10 14 19 ||| @S ||| sein Wert daher nicht auch verzehnfachen
+10 15 15 ||| NN ||| Wert
+10 16 16 ||| PROAV ||| daher
+10 16 19 ||| VP ||| daher nicht auch verzehnfachen
+10 17 17 ||| PTKNEG ||| nicht
+10 17 18 ||| AVP ||| nicht auch
+10 17 19 ||| @VP ||| nicht auch verzehnfachen
+10 18 18 ||| ADV ||| auch
+10 19 19 ||| VVPP ||| verzehnfachen
+10 20 20 ||| $. ||| ?
+11 0 0 ||| VVPP ||| Zugegeben
+11 0 14 ||| VP ||| Zugegeben : Es bedarf keiner großen Fantasie , um sich einen noch höheren Goldpreis vorzustellen
+11 0 15 ||| PSEUDO ||| Zugegeben : Es bedarf keiner großen Fantasie , um sich einen noch höheren Goldpreis vorzustellen .
+11 1 1 ||| $. ||| :
+11 1 14 ||| @VP ||| : Es bedarf keiner großen Fantasie , um sich einen noch höheren Goldpreis vorzustellen
+11 2 2 ||| PPER ||| Es
+11 2 14 ||| S ||| Es bedarf keiner großen Fantasie , um sich einen noch höheren Goldpreis vorzustellen
+11 3 3 ||| VMFIN ||| bedarf
+11 3 14 ||| @S ||| bedarf keiner großen Fantasie , um sich einen noch höheren Goldpreis vorzustellen
+11 4 4 ||| PIS ||| keiner
+11 4 14 ||| @S ||| keiner großen Fantasie , um sich einen noch höheren Goldpreis vorzustellen
+11 5 5 ||| ADJA ||| großen
+11 5 6 ||| NP ||| großen Fantasie
+11 5 14 ||| @S ||| großen Fantasie , um sich einen noch höheren Goldpreis vorzustellen
+11 6 6 ||| NN ||| Fantasie
+11 7 7 ||| $, ||| ,
+11 7 14 ||| @S ||| , um sich einen noch höheren Goldpreis vorzustellen
+11 8 8 ||| KOUI ||| um
+11 8 14 ||| VP ||| um sich einen noch höheren Goldpreis vorzustellen
+11 9 9 ||| PRF ||| sich
+11 9 14 ||| @VP ||| sich einen noch höheren Goldpreis vorzustellen
+11 10 10 ||| ART ||| einen
+11 10 13 ||| NP ||| einen noch höheren Goldpreis
+11 10 14 ||| @VP ||| einen noch höheren Goldpreis vorzustellen
+11 11 11 ||| ADV ||| noch
+11 11 12 ||| AP ||| noch höheren
+11 11 13 ||| @NP ||| noch höheren Goldpreis
+11 12 12 ||| ADJA ||| höheren
+11 13 13 ||| NN ||| Goldpreis
+11 14 14 ||| VVIZU ||| vorzustellen
+11 15 15 ||| $. ||| .
+12 0 0 ||| KON ||| Denn
+12 0 13 ||| S ||| Denn inflationsbereinigt erreicht der Goldpreis von heute nicht annähernd das Allzeithoch von Januar 1980
+12 0 14 ||| PSEUDO ||| Denn inflationsbereinigt erreicht der Goldpreis von heute nicht annähernd das Allzeithoch von Januar 1980 .
+12 1 1 ||| ADJD ||| inflationsbereinigt
+12 1 13 ||| @S ||| inflationsbereinigt erreicht der Goldpreis von heute nicht annähernd das Allzeithoch von Januar 1980
+12 2 2 ||| VVFIN ||| erreicht
+12 2 13 ||| @S ||| erreicht der Goldpreis von heute nicht annähernd das Allzeithoch von Januar 1980
+12 3 3 ||| ART ||| der
+12 3 4 ||| NP ||| der Goldpreis
+12 3 13 ||| @S ||| der Goldpreis von heute nicht annähernd das Allzeithoch von Januar 1980
+12 4 4 ||| NN ||| Goldpreis
+12 5 5 ||| APPR ||| von
+12 5 8 ||| PP ||| von heute nicht annähernd
+12 5 13 ||| @S ||| von heute nicht annähernd das Allzeithoch von Januar 1980
+12 6 6 ||| ADV ||| heute
+12 6 8 ||| AP ||| heute nicht annähernd
+12 7 7 ||| PTKNEG ||| nicht
+12 7 8 ||| @AP ||| nicht annähernd
+12 8 8 ||| ADJA ||| annähernd
+12 9 9 ||| ART ||| das
+12 9 13 ||| NP ||| das Allzeithoch von Januar 1980
+12 10 10 ||| NN ||| Allzeithoch
+12 10 13 ||| @NP ||| Allzeithoch von Januar 1980
+12 11 11 ||| APPR ||| von
+12 11 13 ||| PP ||| von Januar 1980
+12 12 12 ||| NN ||| Januar
+12 12 13 ||| @PP ||| Januar 1980
+12 13 13 ||| CARD ||| 1980
+12 14 14 ||| $. ||| .
+13 0 0 ||| ADV ||| Damals
+13 0 15 ||| S ||| Damals lag Gold bei 850 Dollar , also in heutigem Geldwert um einiges über 2.000 Dollar
+13 0 16 ||| PSEUDO ||| Damals lag Gold bei 850 Dollar , also in heutigem Geldwert um einiges über 2.000 Dollar .
+13 1 1 ||| VVFIN ||| lag
+13 1 15 ||| @S ||| lag Gold bei 850 Dollar , also in heutigem Geldwert um einiges über 2.000 Dollar
+13 2 2 ||| NN ||| Gold
+13 2 10 ||| NP ||| Gold bei 850 Dollar , also in heutigem Geldwert
+13 2 15 ||| @S ||| Gold bei 850 Dollar , also in heutigem Geldwert um einiges über 2.000 Dollar
+13 3 3 ||| APPR ||| bei
+13 3 10 ||| PP ||| bei 850 Dollar , also in heutigem Geldwert
+13 4 4 ||| CARD ||| 850
+13 4 10 ||| @PP ||| 850 Dollar , also in heutigem Geldwert
+13 5 5 ||| NN ||| Dollar
+13 5 10 ||| @PP ||| Dollar , also in heutigem Geldwert
+13 6 6 ||| $, ||| ,
+13 6 10 ||| @PP ||| , also in heutigem Geldwert
+13 7 7 ||| ADV ||| also
+13 7 10 ||| PP ||| also in heutigem Geldwert
+13 8 8 ||| APPR ||| in
+13 8 10 ||| @PP ||| in heutigem Geldwert
+13 9 9 ||| ADJA ||| heutigem
+13 9 10 ||| @PP ||| heutigem Geldwert
+13 10 10 ||| NN ||| Geldwert
+13 11 11 ||| APPR ||| um
+13 11 15 ||| PP ||| um einiges über 2.000 Dollar
+13 12 12 ||| PIAT ||| einiges
+13 12 15 ||| @PP ||| einiges über 2.000 Dollar
+13 13 13 ||| ADJD ||| über
+13 13 14 ||| AP ||| über 2.000
+13 13 15 ||| @PP ||| über 2.000 Dollar
+13 14 14 ||| ADJA ||| 2.000
+13 15 15 ||| NN ||| Dollar
+13 16 16 ||| $. ||| .
+14 0 0 ||| ADV ||| Allerdings
+14 0 17 ||| S ||| Allerdings gab es im Januar 1980 offensichtlich einen „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität
+14 0 18 ||| PSEUDO ||| Allerdings gab es im Januar 1980 offensichtlich einen „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität .
+14 1 1 ||| VVFIN ||| gab
+14 1 17 ||| @S ||| gab es im Januar 1980 offensichtlich einen „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität
+14 2 2 ||| PPER ||| es
+14 2 17 ||| @S ||| es im Januar 1980 offensichtlich einen „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität
+14 3 3 ||| APPRART ||| im
+14 3 5 ||| PP ||| im Januar 1980
+14 3 17 ||| @S ||| im Januar 1980 offensichtlich einen „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität
+14 4 4 ||| NN ||| Januar
+14 4 5 ||| @PP ||| Januar 1980
+14 5 5 ||| CARD ||| 1980
+14 6 6 ||| ADJD ||| offensichtlich
+14 6 17 ||| @S ||| offensichtlich einen „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität
+14 7 7 ||| ART ||| einen
+14 7 17 ||| NP ||| einen „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität
+14 8 8 ||| NE ||| „
+14 8 11 ||| MPN ||| „ Freak Peak “
+14 8 17 ||| @NP ||| „ Freak Peak “ in einer Zeit erhöhter geopolitischer Instabilität
+14 9 9 ||| NE ||| Freak
+14 9 11 ||| @MPN ||| Freak Peak “
+14 10 10 ||| NE ||| Peak
+14 10 11 ||| @MPN ||| Peak “
+14 11 11 ||| NE ||| “
+14 12 12 ||| APPR ||| in
+14 12 17 ||| PP ||| in einer Zeit erhöhter geopolitischer Instabilität
+14 13 13 ||| ART ||| einer
+14 13 17 ||| @PP ||| einer Zeit erhöhter geopolitischer Instabilität
+14 14 14 ||| NN ||| Zeit
+14 14 17 ||| @PP ||| Zeit erhöhter geopolitischer Instabilität
+14 15 15 ||| ADJD ||| erhöhter
+14 15 16 ||| AP ||| erhöhter geopolitischer
+14 15 17 ||| NP ||| erhöhter geopolitischer Instabilität
+14 16 16 ||| ADJA ||| geopolitischer
+14 17 17 ||| NN ||| Instabilität
+14 18 18 ||| $. ||| .
+15 0 0 ||| APPR ||| Bei
+15 0 5 ||| PP ||| Bei einem Wert von 1.300 Dollar
+15 0 22 ||| S ||| Bei einem Wert von 1.300 Dollar ist der heutige Preis wohl doppelt so hoch wie die sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 0 23 ||| PSEUDO ||| Bei einem Wert von 1.300 Dollar ist der heutige Preis wohl doppelt so hoch wie die sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise .
+15 1 1 ||| ART ||| einem
+15 1 5 ||| @PP ||| einem Wert von 1.300 Dollar
+15 2 2 ||| NN ||| Wert
+15 2 5 ||| @PP ||| Wert von 1.300 Dollar
+15 3 3 ||| APPR ||| von
+15 3 5 ||| PP ||| von 1.300 Dollar
+15 4 4 ||| CARD ||| 1.300
+15 4 5 ||| @PP ||| 1.300 Dollar
+15 5 5 ||| NN ||| Dollar
+15 6 6 ||| VAFIN ||| ist
+15 6 22 ||| @S ||| ist der heutige Preis wohl doppelt so hoch wie die sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 7 7 ||| ART ||| der
+15 7 9 ||| NP ||| der heutige Preis
+15 7 22 ||| @S ||| der heutige Preis wohl doppelt so hoch wie die sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 8 8 ||| ADJA ||| heutige
+15 8 9 ||| @NP ||| heutige Preis
+15 9 9 ||| NN ||| Preis
+15 10 10 ||| ADV ||| wohl
+15 10 12 ||| AVP ||| wohl doppelt so
+15 10 22 ||| AP ||| wohl doppelt so hoch wie die sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 11 11 ||| ADJD ||| doppelt
+15 11 12 ||| @AVP ||| doppelt so
+15 12 12 ||| ADV ||| so
+15 13 13 ||| ADJD ||| hoch
+15 13 22 ||| @AP ||| hoch wie die sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 14 14 ||| KOKOM ||| wie
+15 14 22 ||| NP ||| wie die sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 15 15 ||| ART ||| die
+15 15 22 ||| @NP ||| die sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 16 16 ||| ADV ||| sehr
+15 16 17 ||| AP ||| sehr langfristigen
+15 16 22 ||| @NP ||| sehr langfristigen , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 17 17 ||| ADJA ||| langfristigen
+15 18 18 ||| $, ||| ,
+15 18 22 ||| @NP ||| , inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 19 19 ||| ADJA ||| inflationsbereinigten
+15 19 22 ||| @NP ||| inflationsbereinigten Durchschnitts @-@ Goldpreise
+15 20 20 ||| NN ||| Durchschnitts
+15 20 22 ||| @NP ||| Durchschnitts @-@ Goldpreise
+15 21 21 ||| NE ||| @-@
+15 21 22 ||| MPN ||| @-@ Goldpreise
+15 22 22 ||| NE ||| Goldpreise
+15 23 23 ||| $. ||| .
+16 0 0 ||| PWS ||| Was
+16 0 13 ||| S ||| Was also könnte einen weiteren kolossalen Anstieg des Goldpreises von diesem Wert aus begründen
+16 0 14 ||| PSEUDO ||| Was also könnte einen weiteren kolossalen Anstieg des Goldpreises von diesem Wert aus begründen ?
+16 1 1 ||| ADV ||| also
+16 1 13 ||| @S ||| also könnte einen weiteren kolossalen Anstieg des Goldpreises von diesem Wert aus begründen
+16 2 2 ||| VVFIN ||| könnte
+16 2 13 ||| @S ||| könnte einen weiteren kolossalen Anstieg des Goldpreises von diesem Wert aus begründen
+16 3 3 ||| ART ||| einen
+16 3 8 ||| NP ||| einen weiteren kolossalen Anstieg des Goldpreises
+16 3 13 ||| @S ||| einen weiteren kolossalen Anstieg des Goldpreises von diesem Wert aus begründen
+16 4 4 ||| ADJA ||| weiteren
+16 4 8 ||| @NP ||| weiteren kolossalen Anstieg des Goldpreises
+16 5 5 ||| ADJA ||| kolossalen
+16 5 8 ||| @NP ||| kolossalen Anstieg des Goldpreises
+16 6 6 ||| NN ||| Anstieg
+16 6 8 ||| @NP ||| Anstieg des Goldpreises
+16 7 7 ||| ART ||| des
+16 7 8 ||| NP ||| des Goldpreises
+16 8 8 ||| NN ||| Goldpreises
+16 9 9 ||| APPR ||| von
+16 9 11 ||| PP ||| von diesem Wert
+16 9 13 ||| @S ||| von diesem Wert aus begründen
+16 10 10 ||| PDAT ||| diesem
+16 10 11 ||| @PP ||| diesem Wert
+16 11 11 ||| NN ||| Wert
+16 12 12 ||| APPR ||| aus
+16 12 13 ||| PP ||| aus begründen
+16 13 13 ||| ADJD ||| begründen
+16 14 14 ||| $. ||| ?
+17 0 0 ||| ART ||| Eine
+17 0 1 ||| NP ||| Eine Möglichkeit
+17 0 10 ||| S ||| Eine Möglichkeit wäre natürlich der totale Zusammenbruch des US @-@ Dollars
+17 0 11 ||| PSEUDO ||| Eine Möglichkeit wäre natürlich der totale Zusammenbruch des US @-@ Dollars .
+17 1 1 ||| NN ||| Möglichkeit
+17 2 2 ||| VVFIN ||| wäre
+17 2 10 ||| @S ||| wäre natürlich der totale Zusammenbruch des US @-@ Dollars
+17 3 3 ||| APPR ||| natürlich
+17 3 10 ||| PP ||| natürlich der totale Zusammenbruch des US @-@ Dollars
+17 4 4 ||| ART ||| der
+17 4 10 ||| @PP ||| der totale Zusammenbruch des US @-@ Dollars
+17 5 5 ||| ADJA ||| totale
+17 5 10 ||| @PP ||| totale Zusammenbruch des US @-@ Dollars
+17 6 6 ||| NN ||| Zusammenbruch
+17 6 10 ||| @PP ||| Zusammenbruch des US @-@ Dollars
+17 7 7 ||| ART ||| des
+17 7 10 ||| NP ||| des US @-@ Dollars
+17 8 8 ||| NN ||| US
+17 8 10 ||| @NP ||| US @-@ Dollars
+17 9 9 ||| NE ||| @-@
+17 9 10 ||| MPN ||| @-@ Dollars
+17 10 10 ||| NE ||| Dollars
+17 11 11 ||| $. ||| .
+18 0 0 ||| APPR ||| Angesichts
+18 0 6 ||| PP ||| Angesichts ausufernder Defizite und einer richtungslosen Fiskalpolitik
+18 0 21 ||| S ||| Angesichts ausufernder Defizite und einer richtungslosen Fiskalpolitik fragt man sich , ob eine populistische Administration nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 0 22 ||| PSEUDO ||| Angesichts ausufernder Defizite und einer richtungslosen Fiskalpolitik fragt man sich , ob eine populistische Administration nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde .
+18 1 1 ||| ADJA ||| ausufernder
+18 1 2 ||| NP ||| ausufernder Defizite
+18 1 6 ||| CNP ||| ausufernder Defizite und einer richtungslosen Fiskalpolitik
+18 2 2 ||| NN ||| Defizite
+18 3 3 ||| KON ||| und
+18 3 6 ||| @CNP ||| und einer richtungslosen Fiskalpolitik
+18 4 4 ||| ART ||| einer
+18 4 6 ||| NP ||| einer richtungslosen Fiskalpolitik
+18 5 5 ||| ADJA ||| richtungslosen
+18 5 6 ||| @NP ||| richtungslosen Fiskalpolitik
+18 6 6 ||| NN ||| Fiskalpolitik
+18 7 7 ||| VVFIN ||| fragt
+18 7 21 ||| @S ||| fragt man sich , ob eine populistische Administration nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 8 8 ||| PIS ||| man
+18 8 21 ||| @S ||| man sich , ob eine populistische Administration nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 9 9 ||| PRF ||| sich
+18 9 21 ||| @S ||| sich , ob eine populistische Administration nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 10 10 ||| $, ||| ,
+18 10 21 ||| @S ||| , ob eine populistische Administration nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 11 11 ||| KOUS ||| ob
+18 11 21 ||| S ||| ob eine populistische Administration nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 12 12 ||| ART ||| eine
+18 12 14 ||| NP ||| eine populistische Administration
+18 12 21 ||| @S ||| eine populistische Administration nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 13 13 ||| ADJA ||| populistische
+18 13 14 ||| @NP ||| populistische Administration
+18 14 14 ||| NN ||| Administration
+18 15 15 ||| PTKNEG ||| nicht
+18 15 21 ||| @S ||| nicht doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 16 16 ||| ADV ||| doch
+18 16 21 ||| @S ||| doch leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 17 17 ||| ADJD ||| leichtsinnigerweise
+18 17 21 ||| @S ||| leichtsinnigerweise die Gelddruckmaschine anwerfen würde
+18 18 18 ||| ART ||| die
+18 18 19 ||| NP ||| die Gelddruckmaschine
+18 18 21 ||| @S ||| die Gelddruckmaschine anwerfen würde
+18 19 19 ||| NN ||| Gelddruckmaschine
+18 20 20 ||| ADJD ||| anwerfen
+18 20 21 ||| @S ||| anwerfen würde
+18 21 21 ||| VVFIN ||| würde
+18 22 22 ||| $. ||| .
+19 0 0 ||| KON ||| Und
+19 0 17 ||| S ||| Und wer sich in dieser Hinsicht wirklich Sorgen macht , könnte in Gold tatsächlich die verlässlichste Absicherung finden
+19 0 18 ||| PSEUDO ||| Und wer sich in dieser Hinsicht wirklich Sorgen macht , könnte in Gold tatsächlich die verlässlichste Absicherung finden .
+19 1 1 ||| PWS ||| wer
+19 1 8 ||| S ||| wer sich in dieser Hinsicht wirklich Sorgen macht
+19 1 17 ||| @S ||| wer sich in dieser Hinsicht wirklich Sorgen macht , könnte in Gold tatsächlich die verlässlichste Absicherung finden
+19 2 2 ||| PRF ||| sich
+19 2 8 ||| @S ||| sich in dieser Hinsicht wirklich Sorgen macht
+19 3 3 ||| APPR ||| in
+19 3 5 ||| PP ||| in dieser Hinsicht
+19 3 8 ||| @S ||| in dieser Hinsicht wirklich Sorgen macht
+19 4 4 ||| PDAT ||| dieser
+19 4 5 ||| @PP ||| dieser Hinsicht
+19 5 5 ||| NN ||| Hinsicht
+19 6 6 ||| ADJD ||| wirklich
+19 6 8 ||| @S ||| wirklich Sorgen macht
+19 7 7 ||| NN ||| Sorgen
+19 7 8 ||| @S ||| Sorgen macht
+19 8 8 ||| VVFIN ||| macht
+19 9 9 ||| $, ||| ,
+19 9 17 ||| @S ||| , könnte in Gold tatsächlich die verlässlichste Absicherung finden
+19 10 10 ||| VMFIN ||| könnte
+19 10 17 ||| @S ||| könnte in Gold tatsächlich die verlässlichste Absicherung finden
+19 11 11 ||| APPR ||| in
+19 11 12 ||| PP ||| in Gold
+19 11 17 ||| @S ||| in Gold tatsächlich die verlässlichste Absicherung finden
+19 12 12 ||| NN ||| Gold
+19 13 13 ||| ADV ||| tatsächlich
+19 13 17 ||| VP ||| tatsächlich die verlässlichste Absicherung finden
+19 14 14 ||| ART ||| die
+19 14 16 ||| NP ||| die verlässlichste Absicherung
+19 14 17 ||| @VP ||| die verlässlichste Absicherung finden
+19 15 15 ||| ADJA ||| verlässlichste
+19 15 16 ||| @NP ||| verlässlichste Absicherung
+19 16 16 ||| NN ||| Absicherung
+19 17 17 ||| VVINF ||| finden
+19 18 18 ||| $. ||| .
