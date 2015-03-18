@@ -25,7 +25,7 @@ weight_binary_nt = 1.0
 weight_ed = 1.0
 weight_mt = 1.0
 lm_tm_tension = 0.1
-hard_prune = 3
+hard_prune = 10
 stopwords = []
 all_nonterminals = {}
 lex_dict = {}
@@ -68,6 +68,7 @@ class NonTerminal(object):
             return 0
         else:
             return 1
+
 
     def get_bracketed_repr(self, all_nonterminals):
         if len(self._children) == 0:
@@ -392,6 +393,7 @@ if __name__ == '__main__':
     similarity_metric = options.similarity_metric
     show_span = options.show_span
     show_bracketed = options.show_bracketed
+    save_nltk_tree_img = True
     lex_dict = read_lex(lex_data)
     hard_prune = options.hard_prune
     # spans_dict = corpus_spans(options.nbest)
@@ -458,19 +460,17 @@ if __name__ == '__main__':
                         pass
             closest_unary = unary_nodes[0, n - 1][0]
 
-            # cf = CanvasFrame()
-            # t = Tree.fromstring(closest_unary.get_bracketed_repr(all_nonterminals))
-            # tc = TreeWidget(cf.canvas(), t)
-            # cf.add_widget(tc)
-            # cf.print_to_file('parsetree.' + str(sent_num) + '.ps')
-            # cf.destroy()
             dt, ds = display_tree(closest_unary)
             print dt
             if show_span:
                 print ds
             if show_bracketed:
                 print closest_unary.get_bracketed_repr(all_nonterminals)
-            all_dt.append(dt)
-            all_ds.append(ds)
+            if save_nltk_tree_img:
+                t = Tree.fromstring(closest_unary.get_bracketed_repr(all_nonterminals))
+                t.draw()
+                # tc = TreeWidget(cf.canvas(), t)
+                # cf.add_widget(tc, 100, 100)
+                # cf.print_to_file('parsetree.' + str(sent_num) + '.ps')
+                # cf.destroy()
         pass
-        # print '\n\n'.join([dt + '\n' + ds for dt, ds in zip(all_dt, all_ds)])
