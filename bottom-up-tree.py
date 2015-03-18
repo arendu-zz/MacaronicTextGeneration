@@ -94,8 +94,8 @@ def read_substring_translations(substring_trans_file, substring_spans_file):
         parts = l.split('|||')
         trans = ' '.join(parts[1].split()[1:-1])
         line_num = int(parts[0])
-        #all_score_keys = [ p for p in parts[2].split()) if p.strip().endswith('=') ]
-        #all_score_val_strings = [ p for i,p in enumerate(parts[2].split("=")) if i%2 !=0 ]
+        # all_score_keys = [ p for p in parts[2].split()) if p.strip().endswith('=') ]
+        # all_score_val_strings = [ p for i,p in enumerate(parts[2].split("=")) if i%2 !=0 ]
         #pdb.set_trace()
         #tm_score = sum([float(s) for s in parts[-2].split()[-4:]])
         #lm_score = float(parts[-1])
@@ -125,7 +125,6 @@ def corpus_spans(nbest):
             s.add(parts[part_id].strip())
             span_dict[span] = s
     return span_dict
-
 
 
 def get_similarity(t_x, E_y):
@@ -381,7 +380,6 @@ if __name__ == '__main__':
     show_span = options.show_span
     show_bracketed = options.show_bracketed
     save_nltk_tree_img = True
-    lex_dict = read_lex(lex_data)
     hard_prune = options.hard_prune
     stopwords = codecs.open(options.stopwords, 'r').read().split()
     lm_model = lm.LanguageModel(options.lm)
