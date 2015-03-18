@@ -1,10 +1,15 @@
 __author__ = 'arenduchintala'
+from optparse import OptionParse
 from nltk.tree import Tree
 import pdb
 
 
 if __name__ == '__main__':
-    parses = open('data/moses-files/train.clean.tok.true.20.de.parse', 'r').readlines()
+    opt = OptionParser()
+    opt.add_option("-p", dest="parse", default="data/moses/train.clean.tok.true.20.de.parse")
+    (options, _) = opt.parse_args()
+    parses = open(options.parse,'r').readlines()
+
     for p_idx, p in enumerate(parses):
         t = Tree.fromstring(p, remove_empty_top_bracketing=True)
         t.collapse_unary(collapsePOS=True, collapseRoot=True, joinChar=' | ')
