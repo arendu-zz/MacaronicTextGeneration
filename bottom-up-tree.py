@@ -8,7 +8,7 @@ import utils
 import pdb
 from math import log, exp
 import kenlm as lm
-from editdistance import edscore, editdistance_prob
+from editdistance import EditDistance as ED
 from utils import get_meteor_score as meteor
 
 from nltk import Tree
@@ -16,7 +16,7 @@ from nltk.draw.util import CanvasFrame
 from nltk.draw import TreeWidget
 
 global all_nonterminals, substring_translations, stopwords, lm_model, weight_ed, weight_binary_nt
-global constituent_spans, weight_similarity, similarity_metric, weight_outside_similarity
+global constituent_spans, weight_similarity, similarity_metric, weight_outside_similarity, ed
 weight_outside_similarity = 1.0
 similarity_metric = "e"
 weight_similarity = 1.0
@@ -96,10 +96,10 @@ def read_substring_translations(substring_trans_file, substring_spans_file):
         line_num = int(parts[0])
         # all_score_keys = [ p for p in parts[2].split()) if p.strip().endswith('=') ]
         # all_score_val_strings = [ p for i,p in enumerate(parts[2].split("=")) if i%2 !=0 ]
-        #pdb.set_trace()
-        #tm_score = sum([float(s) for s in parts[-2].split()[-4:]])
-        #lm_score = float(parts[-1])
-        #score = lm_tm_tension * lm_score + (1 - lm_tm_tension) * tm_score
+        # pdb.set_trace()
+        # tm_score = sum([float(s) for s in parts[-2].split()[-4:]])
+        # lm_score = float(parts[-1])
+        # score = lm_tm_tension * lm_score + (1 - lm_tm_tension) * tm_score
 
         final_score = float(parts[-1].strip())
         span_num = spans_by_line_num[line_num]
@@ -128,7 +128,7 @@ def corpus_spans(nbest):
 
 
 def get_similarity(t_x, E_y):
-    global weight_ed, weight_binary_nt, similarity_metric
+    global weight_ed, weight_binary_nt, similarity_metric, ed
     """
     :param t_x: a translation candidate for de substring g_x (cast as a unary nonterminal)
     :param E_y: a list of binary nonterminals which will become the child of current unary node
@@ -140,7 +140,11 @@ def get_similarity(t_x, E_y):
         # TODO: is editdistance_prob doing the right thing? insert/delete/substitute cost = 1/3
         # ed_score = np.log(edscore(t_x.phrase, e_y.phrase))
         if similarity_metric == "e":
-            sim_score = (weight_ed * editdistance_prob(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
+            sim_score = (weight_ed * ed.editdistance_prob(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
+        elif similarity_metric == "c":
+            cs_score, alignment = ed.editdistance(t_x.phrase, e_y.phrase)
+            print alignment
+            sim_score = (weight_ed * cs_score) + (weight_binary_nt * e_y.score)
         elif similarity_metric == "m":
             sim_score = (weight_similarity * meteor(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
         # TODO:(+e_y.score) term not suppose to be?
@@ -369,6 +373,7 @@ if __name__ == '__main__':
     opt.add_option("--sw", dest="stopwords", default="data/moses-files/small_stopwords.txt")
     opt.add_option("--lm", dest="lm", default="data/moses-files/train.clean.tok.true.en.binary",
                    help="english language model file")
+    opt.add_option("--wv", dest="word2vec", default="data/glove.6B.50d.txt", help="word2vec txt file")
     (options, _) = opt.parse_args()
     en_sentences = codecs.open(options.en_corpus, 'r', 'utf-8').readlines()
     de_sentences = codecs.open(options.de_corpus, 'r', 'utf-8').readlines()
@@ -377,15 +382,17 @@ if __name__ == '__main__':
 
     constituent_spans = load_constituent_spans(options.constituent_spans)
     similarity_metric = options.similarity_metric
+
     show_span = options.show_span
     show_bracketed = options.show_bracketed
-    save_nltk_tree_img = False 
+    save_nltk_tree_img = False
     hard_prune = options.hard_prune
     stopwords = codecs.open(options.stopwords, 'r').read().split()
     lm_model = lm.LanguageModel(options.lm)
+    ed = ED(options.word2vec)
     all_ds = []
     all_dt = []
-    for sent_num in xrange(0, 20):
+    for sent_num in xrange(0, 2):
         en = en_sentences[sent_num].split()
         reference_root = ' '.join(en)
         de = de_sentences[sent_num].split()
