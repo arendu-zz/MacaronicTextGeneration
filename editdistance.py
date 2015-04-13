@@ -46,7 +46,7 @@ class EditDistance(object):
                 if a[i - 1] == b[j - 1]:
                     diag = table[i - 1, j - 1] * 1.0
                 else:
-                    cs = self.cosine_sim(self.word2vec[a[i - 1]], self.word2vec[b[j - 1]])
+                    cs = self.cosine_sim(self.word2vec[a[i - 1].lower()], self.word2vec[b[j - 1].lower()])
                     print cs, a[i - 1], b[j - 1]
                     diag = table[i - 1, j - 1] * cs  # substitution cost
                 top = table[i, j - 1] * inset_penalty  # insertion cost
@@ -134,6 +134,7 @@ class EditDistance(object):
         except IOError, err:
             print Exception, err
             return False
+        print 'loading word vecs...'
         with open(word2vec_file) as infile:
             for line in infile:
                 terms = line.split()
@@ -141,6 +142,7 @@ class EditDistance(object):
                 vec = np.array(terms, dtype='|S')
                 vec = vec.astype(np.float32)
                 self.word2vec[word] = vec
+        print 'done.'
         return True
 
 
