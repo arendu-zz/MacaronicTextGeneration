@@ -1,7 +1,6 @@
 # -*- coding: latin1 -*-
 __author__ = 'arenduchintala'
 import numpy as np
-from utils import cosine_sim
 from optparse import OptionParser
 import pdb
 import traceback
@@ -147,11 +146,19 @@ class EditDistance(object):
 
 
 if __name__ == "__main__":
-    x = ", account flows down".split()  #
+    opt = OptionParser()
+    opt.add_option("-x", dest="x", default="this is a test",
+                   help="1st string")
+    opt.add_option("-y", dest="y", default="this is a test",
+                   help="2st string)")
+    opt.add_option("-d", dest="word2vecfile", default="data/glove.6B.50d.txt",
+                   help="txt file with word2vec")
+    (options, _) = opt.parse_args()
+    x = options.x.split()  # ", account flows down".split()  #
     # x = "A L T R U I S M".split()
-    y = "it rain rains down".split()  #
+    y = options.y.split()  # "it rain rains down".split()  #
     # y = "P L A S M A".split()
-    E = EditDistance('data/glove.6B.50d.txt')
+    E = EditDistance(options.word2vecfile)
     ed, alignments = E.editdistance(x, y)
     print ed
     print alignments
