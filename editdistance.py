@@ -1,4 +1,4 @@
-# -*- coding: latin1 -*-
+# -*- coding: utf8 -*-
 __author__ = 'arenduchintala'
 import numpy as np
 from optparse import OptionParser
@@ -21,7 +21,6 @@ class EditDistance(object):
         ed = self.editdistance(a, b)
         edr = ed / float(max(len(a), len(b)))
         return 1.0 - edr
-
 
     def editdistance(self, a, b):
         self.a = a
@@ -48,7 +47,7 @@ class EditDistance(object):
                 else:
                     if a[i-1].lower() in self.word2vec and b[j-1].lower() in self.word2vec:
                         cs = self.cosine_sim(self.word2vec[a[i - 1].lower()], self.word2vec[b[j - 1].lower()])
-                        print cs, a[i - 1], b[j - 1]
+                        #print cs, a[i - 1], b[j - 1]
                     else:
                         cs = substitution_penalty
                     diag = table[i - 1, j - 1] * cs  # substitution cost
@@ -113,9 +112,6 @@ class EditDistance(object):
         return table[i, j]
 
     def cosine_sim(self, v1, v2):
-        assert len(v1) == len(v2)
-        assert isinstance(v1, np.ndarray)
-        assert isinstance(v2, np.ndarray)
         dot = 0.0
         v1_sq = 0.0
         v2_sq = 0.0
@@ -124,7 +120,6 @@ class EditDistance(object):
             v1_sq += v1[i] ** 2.0
             v2_sq += v2[i] ** 2.0
         denom = (np.sqrt(v1_sq) * np.sqrt(v2_sq))
-        assert denom > 0
         i = dot / denom
         i = i if i <= 1 else 1.0
         i = i if i >= 0.0 else 0.0
