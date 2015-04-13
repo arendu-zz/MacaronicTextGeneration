@@ -88,7 +88,7 @@ def read_substring_translations(substring_trans_file, substring_spans_file):
     spans_by_line_num = {}
     for idx, l in enumerate(open(substring_spans_file).readlines()):
         spans_by_line_num[idx] = tuple([int(i) for i in l.split()])
-
+    
     trans_by_span = {}
     for l in codecs.open(substring_trans_file, 'r', 'utf-8').readlines():
         parts = l.split('|||')
@@ -375,6 +375,7 @@ if __name__ == '__main__':
                    help="english language model file")
     opt.add_option("--wv", dest="word2vec", default="data/glove.6B.50d.txt", help="word2vec txt file")
     (options, _) = opt.parse_args()
+    print options
     en_sentences = codecs.open(options.en_corpus, 'r', 'utf-8').readlines()
     de_sentences = codecs.open(options.de_corpus, 'r', 'utf-8').readlines()
     substring_translations = read_substring_translations(options.substr_trans,
