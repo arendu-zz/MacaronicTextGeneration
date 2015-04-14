@@ -22,6 +22,25 @@ class EditDistance(object):
         edr = ed / float(max(len(a), len(b)))
         return 1.0 - edr
 
+    def alignmentdistance(self, a, b):
+        self.a = a
+        self.b = b
+        null_threshold = 5e-1
+        alignments = {}
+        for tb in b:
+            align = (tb, '<eps>')
+            align_max = null_threshold
+            for ta in a:
+                cs = self.cosine_sim(self.word2vec[tb.lower()], self.word2vec[ta.lower()])
+                if cs > align_max:
+                    align = (tb, ta)
+                    align_max = cs
+                else:
+                    pass
+            alignments[align] = align_max
+        return alignments.keys()
+
+
     def editdistance(self, a, b):
         self.a = a
         self.b = b
@@ -45,9 +64,9 @@ class EditDistance(object):
                 if a[i - 1] == b[j - 1]:
                     diag = table[i - 1, j - 1] * 1.0
                 else:
-                    if a[i-1].lower() in self.word2vec and b[j-1].lower() in self.word2vec:
+                    if a[i - 1].lower() in self.word2vec and b[j - 1].lower() in self.word2vec:
                         cs = self.cosine_sim(self.word2vec[a[i - 1].lower()], self.word2vec[b[j - 1].lower()])
-                        #print cs, a[i - 1], b[j - 1]
+                        # print cs, a[i - 1], b[j - 1]
                     else:
                         cs = substitution_penalty
                     diag = table[i - 1, j - 1] * cs  # substitution cost
@@ -55,8 +74,8 @@ class EditDistance(object):
                 left = table[i - 1, j] * delete_penalty  # deletion cost
 
                 best, prev, tok = max((diag, (i - 1, j - 1), (a[i - 1], b[j - 1])),
-                        (top, (i, j - 1), ('<eps>', b[j - 1])),
-                        (left, (i - 1, j), (a[i - 1], '<eps>')))
+                                      (top, (i, j - 1), ('<eps>', b[j - 1])),
+                                      (left, (i - 1, j), (a[i - 1], '<eps>')))
 
                 table[i, j] = best
                 came_from[i, j] = (prev, tok)
@@ -147,11 +166,11 @@ class EditDistance(object):
 if __name__ == "__main__":
     opt = OptionParser()
     opt.add_option("-x", dest="x", default="this is a test",
-            help="1st string")
+                   help="1st string")
     opt.add_option("-y", dest="y", default="this is a test",
-            help="2st string)")
+                   help="2st string)")
     opt.add_option("-d", dest="word2vecfile", default="data/glove.6B.50d.txt",
-            help="txt file with word2vec")
+                   help="txt file with word2vec")
     (options, _) = opt.parse_args()
     x = options.x.split()  # ", account flows down".split()  #
     # x = "A L T R U I S M".split()
