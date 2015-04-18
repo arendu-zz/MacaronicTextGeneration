@@ -10,6 +10,7 @@ if __name__ == '__main__':
     opt = OptionParser()
     opt.add_option('--l1', dest='lexe2f', help='lex.e2f file')
     opt.add_option('--l2', dest='lexf2e', help='lex.f2e file')
+    opt.add_option('--tt', dest='phrasetable', help='phrase table file')
     opt.add_option('-e', dest='addition2extract', default='addition2extract', help='phrase pairs to add to extracted')
     (options, _) = opt.parse_args()
     seen_pairs = {}
