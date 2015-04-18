@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __author__ = 'arenduchintala'
 """
 This is just like merge_tt_lex.py except instead of merging directly in

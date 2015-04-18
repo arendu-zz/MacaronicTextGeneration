@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __author__ = 'arenduchintala'
 from optparse import OptionParser
 import sys
