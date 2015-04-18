@@ -38,8 +38,8 @@ if __name__ == '__main__':
             en, de = args[0].strip(), args[1].strip()
             if (de, en) not in seen_pairs:
                 lexf2e[de, en] = float(args[2].strip())
-    w_inv = open(options.addition2extract, 'w')
-    w_o = open(options.addition2extract, 'w')
+    w_inv = open(options.addition2extract+'.inv', 'w')
+    w_o = open(options.addition2extract+'.o', 'w')
     w = open(options.addition2extract, 'w')
 
     for k in lexe2f.viewkeys() & lexf2e.viewkeys():
