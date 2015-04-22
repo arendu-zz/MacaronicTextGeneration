@@ -5,7 +5,7 @@ import itertools as it
 import codecs
 import numpy as np
 import utils
-import pdb
+import pdb,sys
 from math import log, exp
 import kenlm as lm
 from editdistance import EditDistance as ED
@@ -16,7 +16,7 @@ from nltk.draw.util import CanvasFrame
 from nltk.draw import TreeWidget
 
 global all_nonterminals, substring_translations, stopwords, lm_model, weight_ed, weight_binary_nt
-global constituent_spans, weight_similarity, similarity_metric, weight_outside_similarity, ed
+global constituent_spans, weight_similarity, similarity_metric, weight_outside_similarity, ed, inclm
 weight_outside_similarity = 1.0
 similarity_metric = "e"
 weight_similarity = 1.0
@@ -42,6 +42,14 @@ class NonTerminal(object):
 
         self.isChildTerminal = False
         self.display_width = 0
+        self.dropped = set([])
+        self.inserted = set([])
+
+    def add_inserted(self, ins):
+        self.inserted.update(ins)
+
+    def add_dropped(self, drop):
+        self.dropped.update(drop)
 
     def add_terminalChild(self, nt_child):
         self._children = [nt_child.idx]
@@ -83,29 +91,42 @@ class NonTerminal(object):
                 all_nonterminals), c2.get_bracketed_repr(all_nonterminals), ')'])
 
 
-def read_substring_translations(substring_trans_file, substring_spans_file):
+def logit(msg):
+    sys.stderr.write(msg)
+    sys.stderr.flush()
+
+def read_substring_translations(substring_trans_file, substring_spans_file, inclm):
     global lm_tm_tension
     spans_by_line_num = {}
+    line_num_2_sent_len = {}
     for idx, l in enumerate(open(substring_spans_file).readlines()):
-        spans_by_line_num[idx] = tuple([int(i) for i in l.split()])
+        assert len(l.split()) == 4
+        ls = l.split()
+        spans_by_line_num[idx] = tuple([int(i) for i in ls[:-1]])
+        line_num_2_sent_len[idx] = int(ls[-1])
     
     trans_by_span = {}
     for l in codecs.open(substring_trans_file, 'r', 'utf-8').readlines():
         parts = l.split('|||')
         trans = ' '.join(parts[1].split()[1:-1])
         line_num = int(parts[0])
-        # all_score_keys = [ p for p in parts[2].split()) if p.strip().endswith('=') ]
-        # all_score_val_strings = [ p for i,p in enumerate(parts[2].split("=")) if i%2 !=0 ]
-        # pdb.set_trace()
-        # tm_score = sum([float(s) for s in parts[-2].split()[-4:]])
-        # lm_score = float(parts[-1])
-        # score = lm_tm_tension * lm_score + (1 - lm_tm_tension) * tm_score
 
-        final_score = float(parts[-1].strip())
         span_num = spans_by_line_num[line_num]
-        # print span_num, trans, score
+        (sent_num, st_span, en_span) = span_num
+        sent_len = line_num_2_sent_len[line_num]
+
+        only_tm_score = sum([float(s) for s in parts[-2].split()[-4:]])/4.0 
+        full_mt_score = float(parts[-1].strip())
+        height_f = (1.0 + float(en_span - st_span))/float(sent_len)
+        #height_f = 0.5 + (height_f * 0.5)
+        final_score_spl = height_f * full_mt_score + (1.0 - height_f) * only_tm_score
+
+        final_score = full_mt_score 
         trans_for_line = trans_by_span.get(span_num, [])
-        trans_for_line.append((final_score, trans))
+        if inclm:
+            trans_for_line.append((final_score_spl, trans))
+        else:
+            trans_for_line.append((final_score, trans))
         trans_by_span[span_num] = trans_for_line
     return trans_by_span
 
@@ -134,6 +155,8 @@ def get_similarity(t_x, E_y):
     :param E_y: a list of binary nonterminals which will become the child of current unary node
     :return: updated t_x with  similary score
     """
+    inserted = None
+    dropped = None
     max_ed_score = float('-inf')
     max_e_yt = None
     for e_y in E_y:
@@ -142,11 +165,14 @@ def get_similarity(t_x, E_y):
         if similarity_metric == "e":
             sim_score = (weight_ed * ed.editdistance_prob(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
         elif similarity_metric == "c":
-            cs_score, alignment = ed.editdistance(t_x.phrase, e_y.phrase)
-            print alignment
-            sim_score = (weight_ed * cs_score) + (weight_binary_nt * e_y.score)
+            cs_score, alignment = ed.editdistance(t_x.phrase.split(), e_y.phrase.split())
+            cs_score  = 1.0 if cs_score > 1.0 else cs_score
+            cs_score = 0.0 if cs_score < 0.0 else cs_score
+            inserted,dropped = ed.alignmentdistance(t_x.phrase.split(), e_y.phrase.split())
+
+            sim_score = (weight_ed * np.log(cs_score)) + (weight_binary_nt * e_y.score)
         elif similarity_metric == "m":
-            sim_score = (weight_similarity * meteor(t_x.phrase, e_y.phrase)) + (weight_binary_nt * e_y.score)
+            sim_score = (weight_similarity * meteor(t_x.phrase.split(), e_y.phrase.split())) + (weight_binary_nt * e_y.score)
         # TODO:(+e_y.score) term not suppose to be?
         if sim_score > max_ed_score:
             max_ed_score = sim_score
@@ -159,7 +185,10 @@ def get_similarity(t_x, E_y):
         t_x.score = max_ed_score + t_x.score
     except ValueError:
         pdb.set_trace()
-
+    if dropped is not None:
+        t_x.add_dropped(dropped)
+    if inserted is not None:
+        t_x.add_inserted(inserted)
     t_x.add_nonTerminalChild(max_e_yt.idx)
     t_x.display_width = max_e_yt.display_width
     return t_x
@@ -367,6 +396,7 @@ if __name__ == '__main__':
     opt.add_option("-b", dest="show_bracketed", action="store_true", default=False,
                    help="show tree in bracketed notation")
     opt.add_option("-s", dest="show_span", action="store_true", default=False, help="show tree spans")
+    opt.add_option("--lt", dest="inclm", action="store_true", default=False, help="increase lm score with height of tree")
     opt.add_option("-c", dest="use_parse_constituents", action="store_true", default=False,
                    help="use parse constituent")
     opt.add_option("--sim", dest="similarity_metric", default="e", help="e or m for editdistance or meteor")
@@ -376,14 +406,14 @@ if __name__ == '__main__':
     opt.add_option("--wv", dest="word2vec", default="data/glove.6B.50d.txt", help="word2vec txt file")
     (options, _) = opt.parse_args()
     print options
+    inclm = options.inclm
+    print 'inclm', inclm
     en_sentences = codecs.open(options.en_corpus, 'r', 'utf-8').readlines()
     de_sentences = codecs.open(options.de_corpus, 'r', 'utf-8').readlines()
     substring_translations = read_substring_translations(options.substr_trans,
-                                                         options.substr_spans)
-
+                                                         options.substr_spans, options.inclm)
     constituent_spans = load_constituent_spans(options.constituent_spans)
     similarity_metric = options.similarity_metric
-
     show_span = options.show_span
     show_bracketed = options.show_bracketed
     save_nltk_tree_img = False
@@ -393,7 +423,7 @@ if __name__ == '__main__':
     ed = ED(options.word2vec)
     all_ds = []
     all_dt = []
-    for sent_num in xrange(0, 2):
+    for sent_num in xrange(0, 20):
         en = en_sentences[sent_num].split()
         reference_root = ' '.join(en)
         de = de_sentences[sent_num].split()
@@ -466,3 +496,8 @@ if __name__ == '__main__':
                 # cf.print_to_file('parsetree.' + str(sent_num) + '.ps')
                 # cf.destroy()
         pass
+    #TODO: prune out phrase table ent where a german verb goes to null
+    #TODO: merger lexical translation table into the phrase table (should fix all unknown word issues) from grow-diag-final
+    #TODO: lm score gets stronger at higer parts of the tree 
+    #TODO: do not use clean when creating  the txtspan
+    

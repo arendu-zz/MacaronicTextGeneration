@@ -21,6 +21,6 @@ if __name__ == '__main__':
         for span in xrange(0, n):
             for i in xrange(0, n - span):
                 k = i + span
-                span_file.write(str(idx) + ' ' + str(i) + ' ' + str(k) + '\n')
+                span_file.write(str(idx) + ' ' + str(i) + ' ' + str(k) + ' '+ str(n)+'\n')
                 s = '$UNK$ <wall/> ' + ' '.join(de_sent[i:k + 1]) + ' <wall/> $UNK$'
                 txt_zone_file.write(s + '\n')

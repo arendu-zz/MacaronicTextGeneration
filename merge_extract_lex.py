@@ -5,7 +5,7 @@ This is just like merge_tt_lex.py except instead of merging directly in
 the phrase table we add phrases into the list of extracted phrases
 """
 from optparse import OptionParser
-import sys
+import sys,codecs
 
 if __name__ == '__main__':
     opt = OptionParser()
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     opt.add_option('-e', dest='addition2extract', default='addition2extract', help='phrase pairs to add to extracted')
     (options, _) = opt.parse_args()
     seen_pairs = {}
-    with open(options.phrasetable) as f:
+    with codecs.open(options.phrasetable, 'r', 'utf-8') as f:
         for line in f:
             args = line.split('|||')
             de = args[0].strip()
@@ -24,7 +24,7 @@ if __name__ == '__main__':
                 seen_pairs[(de, en)] = 1
 
     lexe2f = {}
-    with open(options.lexe2f) as f:
+    with codecs.open(options.lexe2f, 'r', 'utf-8') as f:
         for line in f:
             args = line.split()
             # line =[de, en, score]
@@ -33,16 +33,16 @@ if __name__ == '__main__':
                 lexe2f[de, en] = float(args[2].strip())
 
     lexf2e = {}
-    with open(options.lexf2e) as f:
+    with codecs.open(options.lexf2e, 'r', 'utf-8') as f:
         for line in f:
             args = line.split()
             # line =[en, de, score]
             en, de = args[0].strip(), args[1].strip()
             if (de, en) not in seen_pairs:
                 lexf2e[de, en] = float(args[2].strip())
-    w_inv = open(options.addition2extract+'.inv', 'w')
-    w_o = open(options.addition2extract+'.o', 'w')
-    w = open(options.addition2extract, 'w')
+    w_inv = codecs.open(options.addition2extract+'.inv', 'w', 'utf-8')
+    w_o = codecs.open(options.addition2extract+'.o', 'w', 'utf-8')
+    w = codecs.open(options.addition2extract, 'w', 'utf-8')
 
     for k in lexe2f.viewkeys() & lexf2e.viewkeys():
         de, en = k
